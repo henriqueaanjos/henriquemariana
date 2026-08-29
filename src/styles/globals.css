@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+:root {
+  --background: #FAFAF8;
+  --primary: #D9B982;
+  --primary-dark: #6E4C12;
+  --primary-light: #FFF6E6;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-light: var(--primary-light);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-bickham-script-pro-regular: 'Bickham Script Pro Regular';
+  --font-bickham-script-pro-semibold: 'Bickham Script Pro Semibold';
+  --font-bickham-script-pro-bold: 'Bickham Script Pro Bold';
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {}
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@theme {
+    --font-cormorant: "Cormorant Garamond", serif;
+    --font-lora: "Lora", serif;
+}
+
+@font-face {
+  font-family: 'Bickham Script Pro Regular';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Bickham Script Pro Regular'), url('/fonts/Bickham Script Pro Regular.woff') format('woff');
+}
+
+
+@font-face {
+  font-family: 'Bickham Script Pro Semibold';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Bickham Script Pro Semibold'), url('/fonts/Bickham Script Pro Semibold.woff') format('woff');
+}
+
+
+@font-face {
+  font-family: 'Bickham Script Pro Bold';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Bickham Script Pro Bold'), url('/fonts/Bickham Script Pro Bold.woff') format('woff');
+}
