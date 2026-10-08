@@ -47,9 +47,9 @@ export async function POST(request: Request) {
         minutesToExpire: 60,
 
         callback: {
-          successUrl: `${SITE_URL}/gifts/success`,
-          cancelUrl: `${SITE_URL}/gifts/cancel`,
-          expiredUrl: `${SITE_URL}/gifts/expired`,
+          successUrl: `${SITE_URL}/?gift=success#gifts`,
+          cancelUrl: `${SITE_URL}/?gifts=cancel#gifts`,
+          expiredUrl: `${SITE_URL}/?gifts=expired#gifts`,
         },
 
         items: [
