@@ -1,5 +1,6 @@
-import Input from "../Input";
 import { LiquidGlassWrapper } from "../LiquidGlassWrapper";
+import { PlaylistSearch } from "../PlaylistSearch";
+import { PlaylistSongs } from "../PlaylistSongs";
 
 export function Playlist() {
     return (
@@ -21,12 +22,19 @@ export function Playlist() {
                                 <h1 className="text-base text-primary-light uppercase font-cormorant">Selecione a Música</h1>
                             </div>
                             <div className="w-full h-full grow flex flex-col gap-4">
-                                <Input 
-                                    label="Pesquisa"
-                                    placeholder="Digite o nome da música"
-                                />
-                                <LiquidGlassWrapper className="grow bg-background/20 h-full rounded-3xl">
-                                    <h1>Ranking</h1>
+                                <PlaylistSearch />
+                                <LiquidGlassWrapper className="grow h-full rounded-3xl">
+                                    <div className="flex h-full flex-col p-4">
+                                        <div className="border-b-2 border-primary pb-1 px-2">
+                                            <h1 className="text-base text-primary-light uppercase font-cormorant">
+                                                Ranking
+                                            </h1>
+                                        </div>
+
+                                        <div className="mt-4 min-h-0 flex-1">
+                                            <PlaylistSongs />
+                                        </div>
+                                    </div>
                                 </LiquidGlassWrapper>
                             </div>
                         </div>

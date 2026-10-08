@@ -6,6 +6,12 @@ import { useState } from "react";
 import { Modal } from "./Modal";
 import Input from "./Input";
 import { Dropzone } from "./Dropzone";
+import { z } from "zod";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { uploadImages } from "../services/photos";
+import { NewPhotoModal } from "./Modals/NewPhoto";
 
 export function PhotosGrid() {
     const [isOpen, setIsOpen] = useState(false);
@@ -94,29 +100,7 @@ export function PhotosGrid() {
                     </button>
                 </LiquidGlassWrapper>
             </div>
-            <Modal isOpen={isOpen} onClose={handleCloseModal}>
-                <div className="w-full h-full cursor-default flex flex-col gap-8 overflow-y">
-                    <div className="w-full flex flex-col items-center">
-                        <div className="border-b-2 border-primary pb-1 px-2 text-center">
-                            <h1 className="text-base text-primary-light uppercase font-cormorant">Envie suas fotos</h1>
-                        </div>
-                    </div>
-                    <div className="w-full h-full grow flex flex-col gap-4">
-                        <Input
-                            label="Nome"
-                            placeholder="Digite seu nome completo"
-                        />
-                        <Dropzone />
-                    </div>
-                    <div className="w-full">
-                        <LiquidGlassWrapper className="bg-primary-dark/70 rounded-lg w-full h-full col-span-1 row-span-1 relative">
-                            <button className="px-3 py-2 h-full w-full grow flex flex-col items-center justify-center gap-2  cursor-pointer z-10">
-                                <p className="text-background uppercase font-lora text-sm">Enviar</p>
-                            </button>
-                        </LiquidGlassWrapper>
-                    </div>
-                </div>
-            </Modal>
+            <NewPhotoModal isOpen={isOpen} onClose={handleCloseModal} />
         </div >
     );
 }

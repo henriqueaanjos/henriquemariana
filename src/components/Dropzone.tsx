@@ -1,6 +1,6 @@
 "use client";
 
-import { Trash, Warning } from "@phosphor-icons/react";
+import { DownloadSimple, Trash, UploadSimple, Warning } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
 
 const ALLOWED_TYPES = [
@@ -14,7 +14,11 @@ const ALLOWED_TYPES = [
 
 const ALLOWED_EXTENSIONS = "JPG, PNG, WEBP, TIFF, HEIC ou GIF";
 
-export function Dropzone() {
+type DropzoneProps = {
+    onFilesChange: (files: File[]) => void;
+};
+
+export function Dropzone({ onFilesChange }: DropzoneProps) {
     const [files, setFiles] = useState<File[]>([]);
     const [isDragging, setIsDragging] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -57,6 +61,8 @@ export function Dropzone() {
             ...current,
             ...validFiles,
         ]);
+
+        onFilesChange([...files, ...validFiles]);
     }
 
     function handleDrop(
@@ -105,23 +111,31 @@ export function Dropzone() {
                     }
                 `}
             >
+
                 <label
                     className={`
-                        cursor-pointer text-center
+                        cursor-pointer text-center flex flex-col items-center
                         ${isDragging
                             ? "text-primary-dark"
                             : "text-background"
                         }
                     `}
                 >
+
                     {isDragging ? (
-                        <p className="text-primary-dark">
-                            Solte suas fotos aqui
-                        </p>
+                        <>
+                            <DownloadSimple size={38} className={`mb-4 text-primary`} />
+                            <p className="text-primary-dark">
+                                Solte suas fotos aqui
+                            </p>
+                        </>
                     ) : (
-                        <p className="text-background">
-                            Arraste suas fotos aqui
-                        </p>
+                        <>
+                            <UploadSimple size={38} className={`mb-4 text-primary`} />
+                            <p className="text-background">
+                                Arraste suas fotos aqui
+                            </p>
+                        </>
                     )}
 
                     <p
@@ -169,7 +183,7 @@ export function Dropzone() {
                 flex flex-row items-center justify-center gap-2
             "
                 >
-                    <Warning/> {error}
+                    <Warning /> {error}
                 </p>
             )}
 

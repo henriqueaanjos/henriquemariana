@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Lora, Roboto } from "next/font/google";
+import { Cormorant_Garamond, Lora } from "next/font/google";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -15,6 +15,7 @@ const lora = Lora({
 
 
 import "../styles/globals.css";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -25,9 +26,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`h-full antialiased snap-mandatory snap-y ${cormorant.variable} ${lora.variable}`} 
+      className={`h-full antialiased snap-mandatory snap-y ${cormorant.variable} ${lora.variable}`}
     >
-      <body className={`min-h-full flex flex-col`}>{children}</body>
+      <body className={`min-h-full flex flex-col`}>
+        <Providers>
+          {children}
+        </Providers>
+      </body>
     </html>
   );
 }

@@ -1,129 +1,443 @@
-'use client'
+"use client";
 
-import { ArrowLeftIcon, CreditCardIcon, GiftIcon, MoneyIcon, QrCodeIcon } from "@phosphor-icons/react"
-import Image from "next/image"
-import { LiquidGlassWrapper } from "../LiquidGlassWrapper"
-import { useState } from "react"
-import Link from "next/link"
-import { CardGifts } from "../CardGifts"
-import { Modal } from "../Modal"
+import {
+    ArrowLeftIcon,
+    CreditCardIcon,
+    GiftIcon,
+    MoneyIcon,
+    QrCodeIcon,
+    SpinnerIcon,
+    WarningCircleIcon,
+} from "@phosphor-icons/react";
+
+import { useState } from "react";
+import { createGiftCheckout } from "@/src/services/gifts";
+
+import { LiquidGlassWrapper } from "../LiquidGlassWrapper";
+import { CardGifts } from "../CardGifts";
+import { Modal } from "../Modal";
+
+type SelectedOption = "none" | "gift" | "money";
 
 export function Gifts() {
-    const [isOpen, setIsOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState<"none" | "gift" | "money">("none")
+    const [isPixOpen, setIsPixOpen] = useState(false);
+    const [isCreditCardOpen, setIsCreditCardOpen] = useState(false);
 
-    function handleOpenModal() {
-        setIsOpen(true);
+    const [selectedOption, setSelectedOption] =
+        useState<SelectedOption>("none");
+
+    const [amount, setAmount] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState("");
+
+    function handleOpenPixModal() {
+        setIsPixOpen(true);
     }
 
-    function handleCloseModal() {
-        setIsOpen(false);
+    function handleClosePixModal() {
+        setIsPixOpen(false);
     }
+
+    function handleOpenCreditCardModal() {
+        setAmount("");
+        setError("");
+        setIsCreditCardOpen(true);
+    }
+
+    function handleCloseCreditCardModal() {
+        if (isLoading) return;
+
+        setIsCreditCardOpen(false);
+        setAmount("");
+        setError("");
+    }
+
+    function formatCurrency(value: string) {
+        const numericValue = value.replace(/\D/g, "");
+
+        if (!numericValue) {
+            return "";
+        }
+
+        const cents = Number(numericValue);
+
+        return new Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+        }).format(cents / 100);
+    }
+
+    function getAmountValue() {
+        const numericValue = amount.replace(/\D/g, "");
+
+        if (!numericValue) {
+            return 0;
+        }
+
+        return Number(numericValue) / 100;
+    }
+
+    async function handleCreditCardCheckout() {
+        const value = getAmountValue();
+
+        if (!value || value <= 0) {
+            setError("Digite um valor para o presente.");
+            return;
+        }
+
+        setError("");
+        setIsLoading(true);
+
+        try {
+            const { checkoutUrl } = await createGiftCheckout(value);
+
+            if (!checkoutUrl) {
+                throw new Error("Checkout não encontrado.");
+            }
+
+            window.location.href = checkoutUrl;
+        } catch (error) {
+            console.error("Erro ao criar checkout:", error);
+
+            setError(
+                "Não foi possível iniciar o pagamento. Tente novamente em alguns instantes.",
+            );
+
+            setIsLoading(false);
+        }
+    }
+
     return (
         <section
             id="gifts"
-            className="h-screen w-screen snap-start bg-[url(/AYM_8544-3.jpeg)] bg-cover bg-top bg-no-repeat flex relative flex-col items-center pt-36 px-8 pb-14"
+            className="relative flex h-screen w-screen snap-start flex-col items-center bg-[url(/AYM_8544-3.jpeg)] bg-cover bg-top bg-no-repeat px-8 pt-36 pb-14"
         >
-            <div className="w-full h-full absolute z-0 inset-0 bg-linear-to-t from-olive-900/90 to-olive-900/10 to-65%" />
+            <div className="absolute inset-0 z-0 bg-linear-to-t from-olive-900/90 to-olive-900/10 to-65%" />
+
             <div className="z-1 flex w-full flex-col items-center">
-                <div className="border-b-2 border-primary pb-1 px-2">
-                    <h1 className="text-3xl font-bold text-primary-dark uppercase font-cormorant">Listas de Presentes</h1>
+                <div className="border-b-2 border-primary px-2 pb-1">
+                    <h1 className="font-cormorant text-3xl font-bold uppercase text-primary-dark">
+                        Listas de Presentes
+                    </h1>
                 </div>
-                <h5 className="text-primary-dark text-sm uppercase mt-2 font-lora">A presença de vocês é o nosso maior presente! Se desejarem, reunimos algumas opções com carinho</h5>
+
+                <h5 className="mt-2 text-center font-lora text-sm uppercase text-primary-dark">
+                    A presença de vocês é o nosso maior presente! Se desejarem,
+                    reunimos algumas opções com carinho
+                </h5>
             </div>
-            <div className="mt-7 w-full h-full flex grow flex-col items-start relative ">
-                {selectedOption === "none" ?
-                    <div className="w-[40%] h-full grow  flex flex-col gap-6 items-start justify-center p-4">
-                        <LiquidGlassWrapper className="bg-black/20 rounded-3xl w-full flex-1 cursor-pointer hover:scale-105 transition-all duration-500">
-                            <div className="flex flex-col gap-4 w-full h-full items-center justify-center" onClick={() => setSelectedOption("gift")}>
-                                <GiftIcon size={32} className="text-primary-light" />
-                                <div className="border-b-2 border-primary pb-1 px-2">
-                                    <h1 className="text-base text-primary-light uppercase font-cormorant">Lista de Presentes</h1>
+
+            <div className="relative mt-7 flex h-full w-full grow flex-col items-start">
+                {/* ====================================================== */}
+                {/* MENU PRINCIPAL                                         */}
+                {/* ====================================================== */}
+
+                {selectedOption === "none" && (
+                    <div className="flex h-full w-[40%] grow flex-col items-start justify-center gap-6 p-4">
+                        <LiquidGlassWrapper className="w-full flex-1 cursor-pointer rounded-3xl bg-black/20 transition-all duration-500 hover:scale-105">
+                            <div
+                                className="flex h-full w-full flex-col items-center justify-center gap-4"
+                                onClick={() => setSelectedOption("gift")}
+                            >
+                                <GiftIcon
+                                    size={32}
+                                    className="text-primary-light"
+                                />
+
+                                <div className="border-b-2 border-primary px-2 pb-1">
+                                    <h1 className="font-cormorant text-base uppercase text-primary-light">
+                                        Lista de Presentes
+                                    </h1>
                                 </div>
-                                <p className="font-lora text-primary-light/70 font-light text-sm">Para o nosso novo lar, com carinho</p>
+
+                                <p className="font-lora text-sm font-light text-primary-light/70">
+                                    Para o nosso novo lar, com carinho
+                                </p>
                             </div>
                         </LiquidGlassWrapper>
-                        <LiquidGlassWrapper className="bg-black/20 rounded-3xl w-full flex-1 cursor-pointer hover:scale-105 transition-all duration-500">
-                            <div className="flex flex-col gap-4 w-full h-full items-center justify-center" onClick={() => setSelectedOption("money")}>
-                                <MoneyIcon size={32} className="text-primary-light" />
-                                <div className="border-b-2 border-primary pb-1 px-2">
-                                    <h1 className="text-base text-primary-light uppercase font-cormorant">Presentes em Dinheiro</h1>
+
+                        <LiquidGlassWrapper className="w-full flex-1 cursor-pointer rounded-3xl bg-black/20 transition-all duration-500 hover:scale-105">
+                            <div
+                                className="flex h-full w-full flex-col items-center justify-center gap-4"
+                                onClick={() => setSelectedOption("money")}
+                            >
+                                <MoneyIcon
+                                    size={32}
+                                    className="text-primary-light"
+                                />
+
+                                <div className="border-b-2 border-primary px-2 pb-1">
+                                    <h1 className="font-cormorant text-base uppercase text-primary-light">
+                                        Presentes em Dinheiro
+                                    </h1>
                                 </div>
-                                <p className="font-lora text-primary-light/70 font-light text-sm">Para os sonhos que estamos construindo juntos.</p>
+
+                                <p className="font-lora text-sm font-light text-primary-light/70">
+                                    Para os sonhos que estamos construindo juntos.
+                                </p>
                             </div>
                         </LiquidGlassWrapper>
                     </div>
-                    : selectedOption === "gift" ?
-                        <>
-                            <LiquidGlassWrapper className="bg-primary-light/40 rounded-lg relative ml-6">
-                                <button className="px-3 py-2 h-full w-full grow flex flex-row items-center justify-center gap-2  cursor-pointer z-10" onClick={() => setSelectedOption("none")}>
-                                    <ArrowLeftIcon size={20} className="text-primary-dark" />
-                                    <p className="text-primary-dark uppercase font-lora text-sm">Voltar</p>
-                                </button>
-                            </LiquidGlassWrapper>
-                            <div className="w-full h-full grow  flex flex-row gap-6 items-center pb-8 justify-center p-4">
-                                <CardGifts
-                                    href="https://www.finalfeliz.de/henriqueemari"
-                                    imageSrc="/magalu.webp"
-                                    imageAlt={"Magalu"}
-                                    description={"Eletrodomésticos e itens para o nosso lar."}
-                                />
-                                <CardGifts
-                                    href=""
-                                    imageSrc="/Havan_logo.svg"
-                                    imageAlt={"Havan"}
-                                    description={"Utensílios e detalhes para a nossa casa."}
-                                />
-                                <CardGifts
-                                    href=""
-                                    imageSrc="/mmartan-seeklogo.svg"
-                                    imageAlt={"Mmartan"}
-                                    description={"Conforto e aconchego para o nosso lar."}
-                                />
-                                <CardGifts
-                                    href=""
-                                    imageSrc="/sotto_logo.png"
-                                    imageAlt={"Sotto Design"}
-                                    description={"Móveis e detalhes para o nosso cantinho."}
-                                />
-                            </div>
-                        </>
-                        :
-                        <>
-                            <LiquidGlassWrapper className="bg-primary-light/40 rounded-lg relative ml-6">
-                                <button className="px-3 py-2 h-full w-full grow flex flex-row items-center justify-center gap-2  cursor-pointer z-10" onClick={() => setSelectedOption("none")}>
-                                    <ArrowLeftIcon size={20} className="text-primary-dark" />
-                                    <p className="text-primary-dark uppercase font-lora text-sm">Voltar</p>
-                                </button>
-                            </LiquidGlassWrapper>
-                            <div className="w-full h-full grow  flex flex-row gap-6 items-center pb-8 justify-center p-4">
-                                <LiquidGlassWrapper className="bg-black/20 rounded-3xl w-full h-1/2 flex-1 cursor-pointer hover:scale-105 transition-all duration-500">
-                                    <div className="flex flex-col gap-4 w-full h-full items-center justify-center" onClick={handleOpenModal}>
-                                        <QrCodeIcon size={32} className="text-primary-light" />
-                                        <div className="border-b-2 border-primary pb-1 px-2">
-                                            <h1 className="text-base text-primary-light uppercase font-cormorant">Pix</h1>
-                                        </div>
-                                        <p className="font-lora text-primary-light/70 font-light text-sm">Uma contribuição para os nossos próximos passos.</p>
-                                    </div>
-                                </LiquidGlassWrapper>
-                                <LiquidGlassWrapper className="bg-black/20 rounded-3xl w-full h-1/2 flex-1 cursor-pointer hover:scale-105 transition-all duration-500">
-                                    <div className="flex flex-col gap-4 w-full h-full items-center justify-center">
-                                        <CreditCardIcon size={32} className="text-primary-light" />
-                                        <div className="border-b-2 border-primary pb-1 px-2">
-                                            <h1 className="text-base text-primary-light uppercase font-cormorant">Cartão de Crédito</h1>
-                                        </div>
-                                        <p className="font-lora text-primary-light/70 font-light text-sm">Uma forma prática de contribuir com carinho.</p>
-                                    </div>
-                                </LiquidGlassWrapper>
-                            </div>
-                        </>
-                }
-            </div>
-            <Modal isOpen={isOpen} onClose={handleCloseModal}>
-                <div className="w-full h-full flex flex-col items-center justify-center gap-4">
+                )}
 
+                {/* ====================================================== */}
+                {/* LISTA DE PRESENTES                                     */}
+                {/* ====================================================== */}
+
+                {selectedOption === "gift" && (
+                    <>
+                        <LiquidGlassWrapper className="relative ml-6 rounded-lg bg-primary-light/40">
+                            <button
+                                type="button"
+                                className="z-10 flex h-full w-full grow cursor-pointer flex-row items-center justify-center gap-2 px-3 py-2"
+                                onClick={() => setSelectedOption("none")}
+                            >
+                                <ArrowLeftIcon
+                                    size={20}
+                                    className="text-primary-dark"
+                                />
+
+                                <p className="font-lora text-sm uppercase text-primary-dark">
+                                    Voltar
+                                </p>
+                            </button>
+                        </LiquidGlassWrapper>
+
+                        <div className="flex h-full w-full grow flex-row items-center justify-center gap-6 p-4 pb-8">
+                            <CardGifts
+                                href="https://www.finalfeliz.de/henriqueemari"
+                                imageSrc="/magalu.webp"
+                                imageAlt="Magalu"
+                                description="Eletrodomésticos e itens para o nosso lar."
+                            />
+
+                            <CardGifts
+                                href=""
+                                imageSrc="/Havan_logo.svg"
+                                imageAlt="Havan"
+                                description="Utensílios e detalhes para a nossa casa."
+                            />
+
+                            <CardGifts
+                                href=""
+                                imageSrc="/mmartan-seeklogo.svg"
+                                imageAlt="Mmartan"
+                                description="Conforto e aconchego para o nosso lar."
+                            />
+
+                            <CardGifts
+                                href=""
+                                imageSrc="/sotto_logo.png"
+                                imageAlt="Sotto Design"
+                                description="Móveis e detalhes para o nosso cantinho."
+                            />
+                        </div>
+                    </>
+                )}
+
+                {/* ====================================================== */}
+                {/* PRESENTES EM DINHEIRO                                  */}
+                {/* ====================================================== */}
+
+                {selectedOption === "money" && (
+                    <>
+                        <LiquidGlassWrapper className="relative ml-6 rounded-lg bg-primary-light/40">
+                            <button
+                                type="button"
+                                className="z-10 flex h-full w-full grow cursor-pointer flex-row items-center justify-center gap-2 px-3 py-2"
+                                onClick={() => setSelectedOption("none")}
+                            >
+                                <ArrowLeftIcon
+                                    size={20}
+                                    className="text-primary-dark"
+                                />
+
+                                <p className="font-lora text-sm uppercase text-primary-dark">
+                                    Voltar
+                                </p>
+                            </button>
+                        </LiquidGlassWrapper>
+
+                        <div className="flex h-full w-full grow flex-row items-center justify-center gap-6 p-4 pb-8">
+                            {/* ================================================= */}
+                            {/* PIX                                                 */}
+                            {/* ================================================= */}
+
+                            <LiquidGlassWrapper className="h-1/2 w-full flex-1 cursor-pointer rounded-3xl bg-black/20 transition-all duration-500 hover:scale-105">
+                                <button
+                                    type="button"
+                                    className="flex h-full w-full flex-col items-center justify-center gap-4"
+                                    onClick={handleOpenPixModal}
+                                >
+                                    <QrCodeIcon
+                                        size={32}
+                                        className="text-primary-light"
+                                    />
+
+                                    <div className="border-b-2 border-primary px-2 pb-1">
+                                        <h1 className="font-cormorant text-base uppercase text-primary-light">
+                                            Pix
+                                        </h1>
+                                    </div>
+                                </button>
+                            </LiquidGlassWrapper>
+
+                            {/* ================================================= */}
+                            {/* CARTÃO                                              */}
+                            {/* ================================================= */}
+
+                            <LiquidGlassWrapper className="h-1/2 w-full flex-1 cursor-pointer rounded-3xl bg-black/20 transition-all duration-500 hover:scale-105">
+                                <button
+                                    type="button"
+                                    className="flex h-full w-full flex-col items-center justify-center gap-4"
+                                    onClick={handleOpenCreditCardModal}
+                                >
+                                    <CreditCardIcon
+                                        size={32}
+                                        className="text-primary-light"
+                                    />
+
+                                    <div className="border-b-2 border-primary px-2 pb-1">
+                                        <h1 className="font-cormorant text-base uppercase text-primary-light">
+                                            Cartão de Crédito
+                                        </h1>
+                                    </div>
+                                </button>
+                            </LiquidGlassWrapper>
+                        </div>
+                    </>
+                )}
+            </div>
+
+            {/* ======================================================== */}
+            {/* MODAL PIX                                               */}
+            {/* ======================================================== */}
+
+            <Modal
+                isOpen={isPixOpen}
+                onClose={handleClosePixModal}
+            >
+                <div className="flex h-full w-full flex-col items-center justify-center gap-6 p-6">
+                    <div className="border-b-2 border-primary px-2 pb-1">
+                        <h2 className="font-cormorant text-2xl uppercase text-primary-dark">
+                            Presente via Pix
+                        </h2>
+                    </div>
+
+                    <p className="max-w-sm text-center font-lora text-sm leading-relaxed text-primary-dark/70">
+                        Em breve disponibilizaremos os dados para contribuição via Pix.
+                    </p>
+                </div>
+            </Modal>
+
+            {/* ======================================================== */}
+            {/* MODAL CARTÃO                                             */}
+            {/* ======================================================== */}
+
+            <Modal
+                isOpen={isCreditCardOpen}
+                onClose={handleCloseCreditCardModal}
+            >
+                <div className="flex h-full w-full flex-col items-center justify-center gap-6 p-6">
+                    {/* ÍCONE */}
+
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
+                        <CreditCardIcon
+                            size={28}
+                            className="text-primary-dark"
+                        />
+                    </div>
+
+                    {/* TÍTULO */}
+
+                    <div className="flex flex-col items-center gap-2">
+                        <div className="border-b-2 border-primary px-2 pb-1">
+                            <h2 className="font-cormorant text-2xl uppercase text-primary-light">
+                                Presente
+                            </h2>
+                        </div>
+
+                        <p className="max-w-xs text-center font-lora text-sm leading-relaxed text-primary-light/60">
+                            Escolha o valor que deseja presentear.
+                        </p>
+                    </div>
+
+                    {/* VALOR */}
+
+                    <div className="w-full max-w-xs">
+                        <label
+                            htmlFor="gift-amount"
+                            className="mb-2 block text-center font-lora text-[11px] uppercase tracking-[0.14em] text-primary-light/50"
+                        >
+                            Valor do presente
+                        </label>
+
+                        <div className="relative">
+                            <input
+                                id="gift-amount"
+                                type="text"
+                                inputMode="numeric"
+                                autoComplete="off"
+                                value={formatCurrency(amount)}
+                                onChange={(event) => {
+                                    const numericValue =
+                                        event.target.value.replace(/\D/g, "");
+
+                                    setAmount(numericValue);
+                                    setError("");
+                                }}
+                                placeholder="R$ 0,00"
+                                disabled={isLoading}
+                                className="h-14 w-full rounded-2xl border border-primary-light/10 bg-primary-light/5 px-5 text-center font-lora text-xl text-primary-light outline-none transition-all placeholder:text-primary-light/20 focus:border-primary/50 focus:bg-white/50 disabled:opacity-50"
+                            />
+                        </div>
+
+                        {error && (
+                            <div className="mt-3 flex items-center justify-center gap-2 text-center text-xs text-red-700/80">
+                                <WarningCircleIcon
+                                    size={15}
+                                    weight="fill"
+                                />
+
+                                <span>{error}</span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* BOTÃO */}
+
+                    <button
+                        type="button"
+                        disabled={isLoading}
+                        onClick={handleCreditCardCheckout}
+                        className="flex h-12 w-full max-w-xs items-center justify-center gap-2 rounded-2xl bg-primary-dark/40 px-5 font-lora text-xs uppercase tracking-[0.08em] text-primary-light transition-all hover:bg-primary-dark/90 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                        {isLoading ? (
+                            <>
+                                <SpinnerIcon
+                                    size={18}
+                                    className="animate-spin"
+                                />
+
+                                <span>Abrindo pagamento...</span>
+                            </>
+                        ) : (
+                            <>
+                                <CreditCardIcon size={18} />
+
+                                <span>Continuar para pagamento</span>
+                            </>
+                        )}
+                    </button>
+
+                    {/* INFORMAÇÃO */}
+
+                    <p className="max-w-xs text-center font-lora text-[10px] leading-relaxed text-primary-light">
+                        O pagamento será realizado com segurança através do Asaas.
+                        Os dados do cartão não são armazenados em nosso site.
+                    </p>
                 </div>
             </Modal>
         </section>
-    )
+    );
 }
