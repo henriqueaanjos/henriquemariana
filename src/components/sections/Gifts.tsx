@@ -273,7 +273,7 @@ export function Gifts() {
   return (
     <section
       id="gifts"
-      className="relative flex h-screen w-screen snap-start flex-col items-center bg-[url(/AYM_8544-3.jpeg)] bg-cover bg-top bg-no-repeat px-8 pt-36 pb-14"
+      className="relative flex h-screen w-screen snap-start flex-col items-center bg-[url(/AYM_8552.jpeg)] bg-cover bg-top bg-no-repeat px-8 pt-36 pb-14"
     >
       <div className="absolute inset-0 z-0 bg-linear-to-t from-olive-900/90 to-olive-900/10 to-65%" />
 
@@ -285,8 +285,7 @@ export function Gifts() {
         </div>
 
         <h5 className="mt-2 text-center font-lora text-sm uppercase text-primary-dark">
-          A presença de vocês é o nosso maior presente! Se
-          desejarem, reunimos algumas opções com carinho
+          Sua presença já é um presente pra nós. Mas se desejar, reunimos algumas opções de presentes
         </h5>
       </div>
 
@@ -379,6 +378,24 @@ export function Gifts() {
                 imageAlt="Magalu"
                 description="Eletrodomésticos e itens para o nosso lar."
               />
+              <CardGifts
+                href="https://wa.me/message/TEOO4FZFVCRCH1"
+                imageSrc="/sotto_logo.png"
+                imageAlt={"Sotto Design"}
+                description={"Móveis e detalhes para o nosso cantinho."}
+              />
+              <CardGifts
+                href=""
+                imageSrc="/Havan_logo.svg"
+                imageAlt={"Havan"}
+                description={"Utensílios e detalhes para a nossa casa."}
+              />
+              <CardGifts
+                href=""
+                imageSrc="/mmartan-seeklogo.svg"
+                imageAlt={"Mmartan"}
+                description={"Conforto e aconchego para o nosso lar."}
+              />
             </div>
           </>
         )}
@@ -436,9 +453,9 @@ export function Gifts() {
                 <button
                   type="button"
                   className="flex h-full w-full flex-col items-center justify-center gap-4"
-                  onClick={
-                    handleOpenCreditCardModal
-                  }
+                  // onClick={
+                  //   handleOpenCreditCardModal
+                  // }
                 >
                   <CreditCardIcon
                     size={32}

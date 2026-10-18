@@ -418,7 +418,7 @@ export function RSVP() {
         </div>
 
         <h5 className="mt-2 font-lora text-sm uppercase text-primary-dark">
-          CONFIRME A SUA PRESENÇA AGORA!
+          CONFIRME A SUA PRESENÇA!
         </h5>
       </div>
 

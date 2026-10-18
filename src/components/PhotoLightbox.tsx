@@ -121,7 +121,7 @@ export function PhotoLightbox({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
-          className="fixed inset-0 z-[999] flex h-screen w-screen items-center justify-center bg-black/80 p-4 backdrop-blur-md"
+          className="fixed inset-0 z-999 flex h-screen w-screen items-center justify-center bg-black/80 p-4 backdrop-blur-md"
           onClick={onClose}
         >
           {/* CONTADOR */}

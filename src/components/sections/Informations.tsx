@@ -29,7 +29,7 @@ export function Information() {
                 justify-center
                 px-6
                 pt-14
-                bg-[url(/AYM_8753_2.jpeg)] bg-cover bg-center bg-no-repeat
+                bg-[url(/AYM_8791-2.jpeg)] bg-cover bg-center bg-no-repeat
             "
         >
              <div className="w-full h-full absolute inset-0 z-0 bg-linear-to-t from-olive-900/90 to-olive-900/10 to-65%" />
@@ -60,7 +60,7 @@ export function Information() {
                 "
             >
                 {/* Título */}
-                <div className="z-1 flex w-full flex-col items-center">
+                <div className="z-1 flex w-full flex-col items-center ">
                     <div className="border-b-2 border-primary pb-1 px-2">
                         <h1 className="text-3xl font-bold text-primary-dark uppercase font-cormorant">Informações</h1>
                     </div>
@@ -146,7 +146,7 @@ export function Information() {
                 {/* Lembretes */}
                 <div className="w-full">
                     <h3 className="mb-3 text-center text-sm font-bold uppercase text-primary-light tracking-widest  font-cormorant">
-                        Alguns lembretes com carinho
+                        Alguns lembretes
                     </h3>
 
                     <div className="grid grid-cols-2 gap-2 md:grid-cols-5">
@@ -258,13 +258,6 @@ export function Information() {
                         </LiquidGlassWrapper>
                     </div>
                 </div>
-
-                {/* Mensagem final */}
-                <p className={`max-w-2xl text-center text-sm italic text-primary-light font-lora`}>
-                    Mais do que regras, são pequenos cuidados para que todos
-                    possam viver cada momento com tranquilidade e aproveitar
-                    essa celebração junto com a gente. 🤍
-                </p>
             </div>
         </section>
     );
