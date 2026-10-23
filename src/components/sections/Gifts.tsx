@@ -394,7 +394,7 @@ export function Gifts() {
                 <button
                   type="button"
                   className="flex h-full min-h-36 w-full flex-col items-center justify-center gap-3 p-5 sm:min-h-48 sm:gap-4 lg:p-4"
-                  // onClick={handleOpenCreditCardModal}
+                  onClick={handleOpenCreditCardModal}
                 >
                   <CreditCardIcon
                     size={32}
