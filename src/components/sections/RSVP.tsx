@@ -55,7 +55,7 @@ function RSVPConfirmationModal({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="flex h-full w-full flex-col gap-6">
+      <div className="flex h-full w-full flex-col gap-5 sm:gap-6">
         <div className="flex w-full flex-col items-center">
           <div className="border-b-2 border-primary px-2 pb-1 text-center">
             <h1 className="font-cormorant text-base uppercase text-primary-light">
@@ -75,7 +75,7 @@ function RSVPConfirmationModal({
 
         <div className="flex flex-col gap-2">
           {pendingMembers.length > 0 && (
-            <div className="rounded-xl bg-background/5 px-4 py-3">
+            <div className="rounded-xl bg-background/5 px-3 py-3 sm:px-4">
               <p className="font-lora text-xs text-background/80">
                 {pendingMembers.length}{" "}
                 {pendingMembers.length === 1
@@ -86,7 +86,7 @@ function RSVPConfirmationModal({
           )}
 
           {declinedMembers.length > 0 && (
-            <div className="rounded-xl bg-background/5 px-4 py-3">
+            <div className="rounded-xl bg-background/5 px-3 py-3 sm:px-4">
               <p className="font-lora text-xs text-background/80">
                 {declinedMembers.length}{" "}
                 {declinedMembers.length === 1
@@ -103,7 +103,7 @@ function RSVPConfirmationModal({
               type="button"
               onClick={onClose}
               disabled={isLoading}
-              className="flex h-11 w-full items-center justify-center font-lora text-xs uppercase text-background transition-opacity hover:opacity-70 disabled:opacity-40"
+              className="flex h-11 w-full items-center justify-center px-2 font-lora text-[10px] uppercase text-background transition-opacity hover:opacity-70 disabled:opacity-40 sm:text-xs"
             >
               Voltar
             </button>
@@ -114,7 +114,7 @@ function RSVPConfirmationModal({
               type="button"
               onClick={onConfirm}
               disabled={isLoading}
-              className="flex h-11 w-full items-center justify-center font-lora text-xs uppercase text-background disabled:opacity-50"
+              className="flex h-11 w-full items-center justify-center px-2 font-lora text-[10px] uppercase text-background disabled:opacity-50 sm:text-xs"
             >
               {isLoading ? "Enviando..." : "Confirmar"}
             </button>
@@ -134,7 +134,7 @@ function MemberResponse({
 }) {
   return (
     <div className="flex w-full flex-col gap-3 border-b border-background/10 pb-4 last:border-b-0 last:pb-0">
-      <p className="font-cormorant text-base uppercase text-primary-light">
+      <p className="break-words font-cormorant text-base uppercase text-primary-light">
         {member.name}
       </p>
 
@@ -142,7 +142,7 @@ function MemberResponse({
         <button
           type="button"
           onClick={() => onChange("CONFIRMED")}
-          className={`flex h-10 flex-1 items-center justify-center gap-2 rounded-lg border transition-all ${
+          className={`flex h-10 min-w-0 flex-1 items-center justify-center gap-1 rounded-lg border transition-all sm:gap-2 ${
             member.status === "CONFIRMED"
               ? "border-primary bg-primary/20 text-primary-light"
               : "border-background/10 bg-background/5 text-background/60 hover:bg-background/10"
@@ -158,7 +158,7 @@ function MemberResponse({
         <button
           type="button"
           onClick={() => onChange("DECLINED")}
-          className={`flex h-10 flex-1 items-center justify-center gap-2 rounded-lg border transition-all ${
+          className={`flex h-10 min-w-0 flex-1 items-center justify-center gap-1 rounded-lg border transition-all sm:gap-2 ${
             member.status === "DECLINED"
               ? "border-[#b8786e]/50 bg-[#b8786e]/15 text-[#e0a39a]"
               : "border-background/10 bg-background/5 text-background/60 hover:bg-background/10"
@@ -194,18 +194,18 @@ function RSVPSuccess({
         duration: 0.35,
         ease: [0.22, 1, 0.36, 1],
       }}
-      className="relative flex h-full w-full flex-col items-center justify-between gap-8 p-6"
+      className="relative flex h-full w-full flex-col items-center justify-between gap-6 p-4 sm:gap-8 sm:p-6"
     >
       <button
         type="button"
         onClick={onBack}
         aria-label="Voltar para o código de confirmação"
-        className="absolute left-4 top-4 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-background/15 bg-background/5 text-background/70 transition-all hover:bg-background/10 hover:text-background"
+        className="absolute left-3 top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-background/15 bg-background/5 text-background/70 transition-all hover:bg-background/10 hover:text-background sm:left-4 sm:top-4"
       >
         <ArrowLeft size={15} />
       </button>
 
-      <div className="flex w-full flex-col items-center pt-2">
+      <div className="flex w-full flex-col items-center pt-6 sm:pt-2">
         <div className="border-b-2 border-primary px-2 pb-1 text-center">
           <h1 className="font-cormorant text-base uppercase text-primary-light">
             Presença confirmada
@@ -222,21 +222,26 @@ function RSVPSuccess({
         </p>
       </div>
 
-      <div className="flex flex-col items-center gap-4">
-        <div className="rounded-3xl bg-white p-6 shadow-xl">
+      <div className="flex max-w-full flex-col items-center gap-3 sm:gap-4">
+        <div className="rounded-2xl bg-white p-3 shadow-xl sm:rounded-3xl sm:p-6">
           <QRCodeSVG
             value={`${window.location.origin}/rsvp/${family.code}`}
             size={220}
             level="H"
+            style={{
+              display: "block",
+              width: "min(220px, 58vw)",
+              height: "auto",
+            }}
           />
         </div>
 
-        <p className="font-lora text-[10px] uppercase tracking-[0.12em] text-background/50">
+        <p className="break-all text-center font-lora text-[10px] uppercase tracking-[0.12em] text-background/50">
           Código: {family.code}
         </p>
       </div>
 
-      <div className="flex w-full max-w-sm gap-2">
+      <div className="flex w-full max-w-sm flex-col gap-2 sm:flex-row">
         <LiquidGlassWrapper className="w-full rounded-lg bg-primary-dark/70">
           <button
             type="button"
@@ -358,10 +363,7 @@ export function RSVP() {
     }
   }
 
-  function handleMemberChange(
-    memberId: string,
-    status: RSVPStatus,
-  ) {
+  function handleMemberChange(memberId: string, status: RSVPStatus) {
     setMembers((currentMembers) =>
       currentMembers.map((member) =>
         member.id === memberId
@@ -408,22 +410,28 @@ export function RSVP() {
   return (
     <section
       id="rsvp"
-      className="relative flex h-screen w-screen snap-start flex-col items-center bg-[url(/AYM_8521_5.jpeg)] bg-cover bg-top bg-no-repeat px-8 pb-14 pt-36"
+      className="
+        relative flex min-h-svh w-full snap-start flex-col
+        items-center bg-[url('/AYM_8521_5.jpeg')] bg-[30%_center] bg-cover sm:bg-top bg-no-repeat
+        px-4 pb-8 pt-28
+        sm:px-6 sm:pb-10 sm:pt-32
+        lg:h-screen lg:min-h-0 lg:w-screen lg:px-8 lg:pb-14 lg:pt-36
+      "
     >
-      <div className="z-1 flex w-full flex-col items-center">
+      <div className="relative z-10 flex w-full shrink-0 flex-col items-center text-center">
         <div className="border-b-2 border-primary px-2 pb-1">
-          <h1 className="font-cormorant text-3xl font-bold uppercase text-primary-dark">
+          <h1 className="font-cormorant text-2xl font-bold uppercase text-primary-dark sm:text-3xl">
             RSVP
           </h1>
         </div>
 
-        <h5 className="mt-2 font-lora text-sm uppercase text-primary-dark">
+        <h5 className="mt-2 font-lora text-xs uppercase text-primary-dark sm:text-sm">
           CONFIRME A SUA PRESENÇA!
         </h5>
       </div>
 
-      <div className="mt-7 flex h-full w-full flex-row-reverse">
-        <div className="flex w-1/2 items-center justify-start">
+      <div className="relative z-10 mt-6 flex w-full flex-1 flex-col items-center justify-center mb-10 lg:mt-7 lg:min-h-0 lg:flex-row-reverse">
+        <div className="flex w-full flex-col items-center justify-start lg:w-1/2 lg:justify-start">
           <motion.div
             layout
             transition={{
@@ -432,9 +440,9 @@ export function RSVP() {
                 ease: [0.22, 1, 0.36, 1],
               },
             }}
-            className="w-[50%] rounded-3xl bg-black/40"
+            className="w-full max-w-xl rounded-3xl bg-black/40 lg:w-[50%] lg:max-w-none"
           >
-            <LiquidGlassWrapper className="w-full rounded-3xl">
+            <LiquidGlassWrapper className="w-full rounded-3xl bg-black/70">
               <AnimatePresence
                 mode="wait"
                 initial={false}
@@ -452,9 +460,9 @@ export function RSVP() {
                       duration: 0.35,
                       ease: [0.22, 1, 0.36, 1],
                     }}
-                    className="flex h-full w-full flex-col items-center gap-20 p-4"
+                    className="flex w-full flex-col items-center gap-8 p-4 sm:gap-12 sm:p-5 lg:gap-20 lg:p-4"
                   >
-                    <div className="border-b-2 border-primary px-2 pb-1">
+                    <div className="border-b-2 border-primary px-2 pb-1 text-center">
                       <h1 className="font-cormorant text-base uppercase text-primary-light">
                         Confirme a presença
                       </h1>
@@ -478,17 +486,15 @@ export function RSVP() {
                       )}
                     </div>
 
-                    <LiquidGlassWrapper className="relative h-full w-full rounded-lg bg-primary-dark/70">
+                    <LiquidGlassWrapper className="relative w-full rounded-lg bg-primary-dark/70">
                       <button
                         type="button"
                         onClick={handleValidate}
                         disabled={isValidating || !code.trim()}
-                        className="z-10 flex h-full w-full grow cursor-pointer flex-col items-center justify-center gap-2 px-3 py-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="z-10 flex h-11 w-full cursor-pointer flex-col items-center justify-center gap-2 px-3 py-2 disabled:cursor-not-allowed disabled:opacity-50 sm:h-12"
                       >
                         <p className="font-lora text-sm uppercase text-background">
-                          {isValidating
-                            ? "Validando..."
-                            : "Validar"}
+                          {isValidating ? "Validando..." : "Validar"}
                         </p>
                       </button>
                     </LiquidGlassWrapper>
@@ -511,20 +517,20 @@ export function RSVP() {
                       duration: 0.35,
                       ease: [0.22, 1, 0.36, 1],
                     }}
-                    className="relative flex h-full max-h-[60vh] w-full flex-col gap-6 overflow-y-auto p-4"
+                    className="relative flex max-h-[70svh] min-h-0 w-full flex-col gap-5 overflow-y-auto p-4 sm:max-h-[65svh] sm:gap-6 sm:p-5 lg:max-h-[60vh] lg:p-4"
                   >
                     <button
                       type="button"
                       onClick={handleBackToCode}
                       aria-label="Voltar"
-                      className="absolute left-4 top-4 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-background/15 bg-background/5 text-background/70 transition-all hover:bg-background/10 hover:text-background"
+                      className="absolute left-3 top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-background/15 bg-background/5 text-background/70 transition-all hover:bg-background/10 hover:text-background sm:left-4 sm:top-4"
                     >
                       <ArrowLeft size={15} />
                     </button>
 
-                    <div className="flex w-full flex-col items-center pt-1">
-                      <div className="border-b-2 border-primary px-2 pb-1 text-center">
-                        <h1 className="font-cormorant text-base uppercase text-primary-light">
+                    <div className="flex w-full flex-col items-center pt-6 sm:pt-1">
+                      <div className="max-w-full border-b-2 border-primary px-2 pb-1 text-center">
+                        <h1 className="break-words font-cormorant text-base uppercase text-primary-light">
                           Família {family.name}
                         </h1>
                       </div>
@@ -540,10 +546,7 @@ export function RSVP() {
                           key={member.id}
                           member={member}
                           onChange={(status) =>
-                            handleMemberChange(
-                              member.id,
-                              status,
-                            )
+                            handleMemberChange(member.id, status)
                           }
                         />
                       ))}
@@ -555,7 +558,7 @@ export function RSVP() {
                           type="button"
                           onClick={handleSubmit}
                           disabled={submitMutation.isPending}
-                          className="z-10 flex h-11 w-full items-center justify-center px-3 py-2 font-lora text-sm uppercase text-background disabled:opacity-50"
+                          className="z-10 flex h-11 w-full items-center justify-center px-3 py-2 font-lora text-xs uppercase text-background disabled:opacity-50 sm:text-sm"
                         >
                           {submitMutation.isPending
                             ? "Enviando..."

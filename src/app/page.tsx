@@ -170,39 +170,39 @@ export default function Home() {
           <Header />
 
           <div className="snap-y snap-mandatory">
-            <div className="snap-start">
+            <div className="snap-none lg:snap-start">
               <Hero />
             </div>
 
-            <div className="snap-start">
+            <div className="snap-none lg:snap-start">
               <Story />
             </div>
 
-            <div className="snap-start">
+            <div className="snap-none lg:snap-start">
               <Dates />
             </div>
 
-            <div className="snap-start">
+            <div className="snap-none lg:snap-start">
               <Information />
             </div>
 
-            <div className="snap-start">
+            <div className="snap-none lg:snap-start">
               <Gifts />
             </div>
 
-            <div className="snap-start">
+            <div className="snap-none lg:snap-start">
               <Gallery />
             </div>
 
-            <div className="snap-start">
+            <div className="snap-none lg:snap-start">
               <Playlist />
             </div>
 
-            <div className="snap-start">
+            <div className="snap-none lg:snap-start">
               <RSVP />
             </div>
 
-            <div className="snap-start">
+            <div className="snap-none lg:snap-start">
               <Recado />
             </div>
           </div>

@@ -37,22 +37,41 @@ export function PhotosGrid() {
     setSelectedPhoto(null);
   }
 
+  const photoClassName =
+    "relative h-full w-full min-h-0 min-w-0 cursor-pointer overflow-hidden";
+
+  const imageClassName =
+    "h-full w-full object-cover object-center transition-transform duration-500 hover:scale-[1.02]";
+
   return (
     <>
-      <div className="w-full h-full grid grid-cols-2 gap-1">
-        <div className="w-full h-full grid grid-cols-2 grid-rows-3 gap-1">
+      <div
+        className="
+          grid w-full grid-cols-1 gap-2
+          sm:gap-3
+          lg:h-full lg:min-h-0 lg:grid-cols-2 lg:gap-1
+        "
+      >
+        {/* GRUPO ESQUERDO */}
+        <div
+          className="
+            grid h-64 min-h-0 w-full grid-cols-2 grid-rows-2 gap-1
+            sm:h-80
+            lg:h-full lg:grid-rows-3
+          "
+        >
           {/* PHOTO 1 */}
           <button
             type="button"
             onClick={() => handleOpenPhoto(0)}
-            className="w-full h-full col-span-2 row-span-2 relative cursor-pointer overflow-hidden"
+            className={`${photoClassName} col-span-2 row-span-1 lg:row-span-2`}
           >
             <Image
               src={galleryPhotos[0]}
               alt="Photo 1"
               fill
-              sizes="100%"
-              className="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-[1.02]"
+              sizes="(max-width: 639px) 100vw, (max-width: 1023px) 100vw, 50vw"
+              className={imageClassName}
             />
           </button>
 
@@ -60,14 +79,14 @@ export function PhotosGrid() {
           <button
             type="button"
             onClick={() => handleOpenPhoto(1)}
-            className="w-full h-full col-span-1 row-span-1 relative cursor-pointer overflow-hidden"
+            className={`${photoClassName} col-span-1 row-span-1`}
           >
             <Image
               src={galleryPhotos[1]}
               alt="Photo 2"
               fill
-              sizes="100%"
-              className="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-[1.02]"
+              sizes="(max-width: 639px) 50vw, (max-width: 1023px) 50vw, 25vw"
+              className={imageClassName}
             />
           </button>
 
@@ -75,31 +94,38 @@ export function PhotosGrid() {
           <button
             type="button"
             onClick={() => handleOpenPhoto(2)}
-            className="w-full h-full col-span-1 row-span-1 relative cursor-pointer overflow-hidden"
+            className={`${photoClassName} col-span-1 row-span-1`}
           >
             <Image
               src={galleryPhotos[2]}
               alt="Photo 3"
               fill
-              sizes="100%"
-              className="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-[1.02]"
+              sizes="(max-width: 639px) 50vw, (max-width: 1023px) 50vw, 25vw"
+              className={imageClassName}
             />
           </button>
         </div>
 
-        <div className="w-full h-full grid grid-cols-2 grid-rows-3 gap-1">
+        {/* GRUPO DIREITO */}
+        <div
+          className="
+            grid h-64 min-h-0 w-full grid-cols-2 grid-rows-2 gap-1
+            sm:h-80
+            lg:h-full lg:grid-rows-3
+          "
+        >
           {/* PHOTO 4 */}
           <button
             type="button"
             onClick={() => handleOpenPhoto(3)}
-            className="w-full h-full col-span-1 row-span-1 relative cursor-pointer overflow-hidden"
+            className={`${photoClassName} col-span-1 row-span-1`}
           >
             <Image
               src={galleryPhotos[3]}
               alt="Photo 4"
               fill
-              sizes="100%"
-              className="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-[1.02]"
+              sizes="(max-width: 639px) 50vw, (max-width: 1023px) 50vw, 25vw"
+              className={imageClassName}
             />
           </button>
 
@@ -107,14 +133,14 @@ export function PhotosGrid() {
           <button
             type="button"
             onClick={() => handleOpenPhoto(4)}
-            className="w-full h-full col-span-1 row-span-2 relative cursor-pointer overflow-hidden"
+            className={`${photoClassName} col-span-1 row-span-1 lg:row-span-2`}
           >
             <Image
               src={galleryPhotos[4]}
               alt="Photo 5"
               fill
-              sizes="100%"
-              className="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-[1.02]"
+              sizes="(max-width: 639px) 50vw, (max-width: 1023px) 50vw, 25vw"
+              className={imageClassName}
             />
           </button>
 
@@ -122,27 +148,30 @@ export function PhotosGrid() {
           <button
             type="button"
             onClick={() => handleOpenPhoto(5)}
-            className="w-full h-full col-span-1 row-span-2 relative cursor-pointer overflow-hidden"
+            className={`${photoClassName} col-span-1 row-span-1 lg:row-span-2`}
           >
             <Image
               src={galleryPhotos[5]}
               alt="Photo 6"
               fill
-              sizes="100%"
-              className="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-[1.02]"
+              sizes="(max-width: 639px) 50vw, (max-width: 1023px) 50vw, 25vw"
+              className={imageClassName}
             />
           </button>
 
           {/* ADD PHOTO */}
-          <LiquidGlassWrapper className="bg-background/20 rounded-xl w-full h-full col-span-1 row-span-1 relative">
+          <LiquidGlassWrapper className="relative col-span-1 row-span-1 h-full w-full rounded-xl bg-background/20">
             <button
               type="button"
               onClick={handleOpenModal}
-              className="h-full w-full grow flex flex-col items-center justify-center gap-2 cursor-pointer z-10"
+              className="z-10 flex h-full w-full cursor-pointer flex-col items-center justify-center gap-2 p-2"
             >
-              <PlusIcon size={32} className="text-background" />
+              <PlusIcon
+                size={32}
+                className="shrink-0 text-background"
+              />
 
-              <p className="text-background uppercase text-sm font-lora font-light">
+              <p className="text-center font-lora text-[10px] font-light uppercase text-background sm:text-xs lg:text-sm">
                 Adicionar nova foto
               </p>
             </button>
@@ -150,11 +179,13 @@ export function PhotosGrid() {
         </div>
       </div>
 
+      {/* MODAL DE NOVA FOTO */}
       <NewPhotoModal
         isOpen={isOpen}
         onClose={handleCloseModal}
       />
 
+      {/* LIGHTBOX */}
       <PhotoLightbox
         photos={galleryPhotos}
         selectedIndex={selectedPhoto}

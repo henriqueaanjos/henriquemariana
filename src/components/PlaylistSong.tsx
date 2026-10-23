@@ -142,7 +142,7 @@ export function PlaylistSong({
                     onClick={handleLike}
                     disabled={likeMutation.isPending}
                     aria-label={liked ? "Remover curtida" : "Curtir música"}
-                    className="flex h-9 w-9 items-center justify-center rounded-full transition hover:bg-white/10 disabled:pointer-events-none disabled:opacity-50"
+                    className="flex h-9 w-9 items-center text-background justify-center rounded-full transition hover:bg-white/10 disabled:pointer-events-none disabled:opacity-50"
                 >
                     <HeartIcon
                         size={20}

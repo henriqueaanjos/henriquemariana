@@ -14,8 +14,8 @@ export function CardGifts({ href, imageSrc, imageAlt, description, active = true
     const isActive = active && href !== "";
     return (
         <LiquidGlassWrapper
-            className={`bg-black/20 rounded-3xl w-full flex-1  hover:scale-105 transition-all duration-500 p-6
-                ${!isActive ? "opacity-70 pointer-events-none" : "opacity-100 cursor-pointer"}    
+            className={` rounded-3xl w-full flex-1  hover:scale-105 transition-all duration-500 p-6
+                ${!isActive ? "bg-black/30 pointer-events-none" : "bg-black/70  cursor-pointer"}    
             `}
         >
             {isActive ? (
@@ -44,7 +44,7 @@ export function CardGifts({ href, imageSrc, imageAlt, description, active = true
                 <div
                     className="flex flex-col w-full h-full items-center"
                 >
-                    <h3 className="text-primary absolute font-lora uppercase z-50">Em breve</h3>
+                    <h3 className="text-primary text-lg absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 font-lora uppercase z-50 opacity-100">Em breve</h3>
                     <div className="w-full h-32 flex items-center justify-center px-8">
                         <Image
                             src={imageSrc}
@@ -52,11 +52,11 @@ export function CardGifts({ href, imageSrc, imageAlt, description, active = true
                             width={500}
                             height={200}
                             sizes="100vw"
-                            className="w-full h-auto max-h-full object-contain invert"
+                            className="w-full h-auto max-h-full object-contain invert opacity-30"
                         />
                     </div>
 
-                    <p className="font-lora text-primary-light/70 font-light text-sm text-center px-4 pb-5">
+                    <p className="font-lora text-primary-light/70 font-light text-sm text-center px-4 pb-5 opacity-30">
                         {description}
                     </p>
                 </div>

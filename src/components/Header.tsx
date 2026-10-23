@@ -126,39 +126,39 @@ export function Header() {
       ? "text-primary-light border-b-primary-light"
       : "text-primary-dark border-b-primary-dark";
 
-      const backgroundClasses =
-      textTheme === "light"
-        ? "bg-primary-dark/50 "
-        : "bg-background/70 ";
+  const backgroundClasses =
+    textTheme === "light"
+      ? "bg-primary-dark/50 "
+      : "bg-background/70 ";
 
   return (
     <header
       className={`
-        fixed top-6 left-1/2 z-50
-        -translate-x-1/2
-        origin-top
-        transition-transform duration-500 ease-out
-        w-[calc(100%-2rem)] sm:w-auto
-        ${
-          isScrolled
-            ? "lg:scale-75 scale-100"
-            : "scale-100"
+    fixed left-0 top-0 z-50
+    w-full
+    origin-top
+    transition-transform duration-500 ease-out
+    lg:left-1/2 lg:top-6 lg:w-auto lg:-translate-x-1/2
+    ${isScrolled
+          ? "scale-100 lg:scale-75"
+          : "scale-100"
         }
-      `}
+  `}
     >
       <LiquidGlassWrapper
         className={`
-          w-full transition-all duration-500
-          p-4 px-4 sm:px-8 lg:px-16
-          rounded-3xl lg:rounded-full
-          ${
-            isMenuOpen
-              ? backgroundClasses
-              : ""
+    w-full transition-all duration-500
+    rounded-none border-x-0 border-t-0
+    p-3 pt-4 px-4
+    ${isMenuOpen
+            ? backgroundClasses
+            : ""
           }
-          lg:bg-transparent lg:backdrop-blur-none
-          lg:border-transparent lg:shadow-none
-        `}
+    lg:rounded-full lg:border
+    lg:p-4 lg:px-16
+    lg:bg-transparent lg:backdrop-blur-none
+    lg:border-transparent lg:shadow-none
+  `}
         isGlassEffect={isMenuOpen || (isScrolled && !isSnapped)}
       >
         <div className="flex w-full flex-col items-center gap-4">
@@ -219,10 +219,9 @@ export function Header() {
                   transition-all duration-500 text-center
                   whitespace-nowrap
                   ${themeClasses}
-                  ${
-                    activeSection === item.id
-                      ? "font-black scale-105 border-b-4"
-                      : ""
+                  ${activeSection === item.id
+                    ? "font-black scale-105 border-b-4"
+                    : ""
                   }
                 `}
               >
@@ -237,10 +236,9 @@ export function Header() {
               w-full overflow-hidden
               transition-all duration-300 ease-in-out
               lg:hidden
-              ${
-                isMenuOpen
-                  ? "max-h-[520px] opacity-100 pointer-events-auto"
-                  : "max-h-0 opacity-0 pointer-events-none"
+              ${isMenuOpen
+                ? "max-h-[520px] opacity-100 pointer-events-auto"
+                : "max-h-0 opacity-0 pointer-events-none"
               }
             `}
             aria-hidden={!isMenuOpen}
@@ -265,10 +263,9 @@ export function Header() {
                     transition-colors duration-300
                     hover:bg-black/5
                     ${themeClasses}
-                    ${
-                      activeSection === item.id
-                        ? "font-bold"
-                        : "font-normal"
+                    ${activeSection === item.id
+                      ? "font-bold"
+                      : "font-normal"
                     }
                   `}
                 >

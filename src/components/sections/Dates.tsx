@@ -103,7 +103,6 @@ export default function Dates() {
                 className="
                   relative mx-auto
                   aspect-[3/4] w-full max-w-64
-                  overflow-hidden
                   rounded-t-full rounded-b-full
                   sm:max-w-72
                   lg:mx-0 lg:h-full lg:max-w-none lg:aspect-auto
@@ -115,6 +114,7 @@ export default function Dates() {
                   fill
                   sizes="(max-width: 639px) 256px, (max-width: 1023px) 288px, 256px"
                   className={`
+                    rounded-t-full rounded-b-full
                     object-cover 
                     ${index === 2 ? "object-[70%_50%]" : "object-[48%_50%]"}
                     transition-transform duration-700
@@ -144,7 +144,7 @@ export default function Dates() {
                 <h1
                   aria-hidden="true"
                   className="
-                    absolute bottom-3 right-1
+                    absolute z-9999 bottom-3 right-1
                     font-bickham-script-pro-regular
                     text-[9rem]/[0.3]
                     text-transparent
@@ -176,7 +176,7 @@ export default function Dates() {
                   {date.title}
                 </h2>
 
-                <p
+                {/* <p
                   className="
                     mt-2 max-w-sm
                     font-lora text-sm leading-relaxed
@@ -186,7 +186,7 @@ export default function Dates() {
                   "
                 >
                   {date.description}
-                </p>
+                </p> */}
               </div>
             </div>
           ))}

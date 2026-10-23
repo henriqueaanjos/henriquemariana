@@ -6,27 +6,52 @@ export function Gallery() {
     return (
         <section
             id="gallery"
-            className="h-screen w-screen snap-start bg-[url(/AYM_8721.JPG)] bg-cover bg-top bg-no-repeat flex relative flex-col items-center pt-36 px-8 pb-14"
+            className="
+        relative flex min-h-svh w-full snap-start flex-col
+        items-center overflow-hidden
+        bg-[url('/AYM_8721.JPG')] bg-cover bg-top bg-no-repeat
+        px-4 pt-28 pb-8
+        sm:px-6 sm:pt-32 sm:pb-10
+        lg:h-screen lg:min-h-0 lg:px-8 lg:pt-36 lg:pb-14
+      "
         >
-            <div className="z-1 flex w-full flex-col items-center">
-                <div className="border-b-2 border-primary pb-1 px-2">
-                    <h1 className="text-3xl font-bold text-primary-light uppercase font-cormorant">Galeria</h1>
+            {/* CABEÇALHO */}
+            <div className="relative z-10 flex w-full shrink-0 flex-col items-center text-center">
+                <div className="border-b-2 border-primary px-2 pb-1">
+                    <h1 className="font-cormorant text-2xl font-bold uppercase text-primary-light sm:text-3xl">
+                        Galeria
+                    </h1>
                 </div>
-                <h5 className="text-primary-light text-sm  uppercase font-lora mt-2">
-                    {/* ADICIONE SUAS FOTOS CONOSCO, E AS FOTOS QUE TIRAR DO GRANDE DIA! */}
+
+                <h5 className="mt-2 max-w-3xl font-lora text-xs uppercase leading-relaxed text-primary-light sm:text-sm">
                     Adicione suas fotos conosco, e as fotos que tirar do grande dia!
                 </h5>
             </div>
-            <div className="mt-7 w-full h-full ">
+
+            {/* GALERIA */}
+            <div
+                className="
+          relative z-10 mt-6 w-full
+          sm:mt-7
+          lg:mt-7 lg:min-h-0 lg:flex-1
+        "
+            >
                 <PhotosGrid />
             </div>
-            <div className="flex items-center mt-11">
-                <LiquidGlassWrapper className="bg-primary/40 rounded-lg w-full h-full col-span-1 row-span-1 relative">
-                    <Link href="/gallery" className="px-4 py-2 h-full w-full grow flex flex-col items-center justify-center gap-2  cursor-pointer z-10">
-                        <p className="text-background uppercase font-lora text-sm font-light">Ver galeria completa</p>
+
+            {/* BOTÃO DA GALERIA COMPLETA */}
+            <div className="relative z-10 mt-6 flex shrink-0 items-center justify-center sm:mt-8 lg:mt-11">
+                <LiquidGlassWrapper className="relative h-full w-full rounded-lg bg-primary/40">
+                    <Link
+                        href="/gallery"
+                        className="z-10 flex h-full w-full cursor-pointer flex-col items-center justify-center gap-2 px-4 py-2"
+                    >
+                        <p className="whitespace-nowrap font-lora text-xs font-light uppercase text-background sm:text-sm">
+                            Ver galeria completa
+                        </p>
                     </Link>
                 </LiquidGlassWrapper>
             </div>
         </section>
-    )
+    );
 }

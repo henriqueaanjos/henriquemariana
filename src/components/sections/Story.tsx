@@ -9,12 +9,13 @@ export function Story() {
         min-h-svh w-full
         snap-start snap-always
         bg-[url('/AYM_8714-5.jpeg')]
-        bg-cover bg-bottom bg-no-repeat
+        bg-cover sm:bg-bottom bg-no-repeat
         overflow-hidden
+        bg-[30%_center]
       "
     >
       {/* Gradiente para garantir a legibilidade do conteúdo */}
-      <div
+      {/* <div
         className="
           absolute inset-0 z-0
           bg-linear-to-l
@@ -22,7 +23,7 @@ export function Story() {
           via-black/15 via-40%
           to-black/0 to-85%
         "
-      />
+      /> */}
 
       <div
         className="
@@ -59,6 +60,7 @@ export function Story() {
               w-full max-w-xl
               rounded-3xl sm:rounded-4xl
               p-5 sm:p-6 md:p-8
+              bg-black/70
             "
           >
             <p

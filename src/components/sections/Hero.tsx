@@ -10,8 +10,10 @@ export function Hero() {
         min-h-[100svh] w-full
         snap-start
         bg-[url('/AYM_8379_3.jpeg')]
-        bg-cover bg-bottom bg-no-repeat
+        bg-cover bg-no-repeat
         overflow-hidden
+        bg-[49%_center]
+        sm:bg-[50%_center]
       "
     >
       {/* Gradiente para melhorar a legibilidade */}
@@ -35,8 +37,7 @@ export function Hero() {
           sm:px-6
           md:px-8
           -mt-12
-          sm:-mt-20
-          md:-mt-40
+         
         "
       >
         <div
@@ -53,9 +54,9 @@ export function Hero() {
               max-w-full
               font-bickham-script-pro-regular
               text-primary-dark
-              text-[clamp(2.8rem,10vw,5rem)]
+              text-[4rem]
               leading-tight
-              whitespace-nowrap
+              sm:whitespace-nowrap
               md:-mb-12 md:text-[7rem]
               lg:-mb-14 lg:text-[8rem]
               xl:-mb-16 xl:text-[10rem]
@@ -77,7 +78,7 @@ export function Hero() {
           </h5>
         </div>
 
-        <div className="w-full max-w-full">
+        <div className="w-full max-w-full mt-14 sm:mt-0">
           <Countdown />
         </div>
       </div>
