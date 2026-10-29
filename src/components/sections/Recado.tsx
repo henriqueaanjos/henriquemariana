@@ -68,7 +68,7 @@ export function Recado() {
     <section
       id="message"
       className="
-        relative flex min-h-svh w-full snap-start flex-col
+        relative flex min-h-svh w-full flex-col
         items-center bg-[url('/AYM_8721.JPG')] bg-cover bg-top bg-no-repeat
         px-4 pb-8 pt-28
         sm:px-6 sm:pb-10 sm:pt-32

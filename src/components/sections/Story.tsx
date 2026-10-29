@@ -7,7 +7,6 @@ export function Story() {
       className="
         relative flex
         min-h-svh w-full
-        snap-start snap-always
         bg-[url('/AYM_8714-5.jpeg')]
         bg-cover sm:bg-bottom bg-no-repeat
         overflow-hidden
@@ -72,55 +71,45 @@ export function Story() {
                 2xl:text-lg
               "
             >
-              Nos conhecemos quando adolescentes, mas um de nós já tinha bem claro o que queria para a vida!
-              <br />
-              <br />
-              Os dois sempre tiveram presentes na vida um do outro indiretamente... 
-              nos víamos em alguns eventos de amigos em comum.
-              <br />
-              <br />
-              Até que em 2023 começamos a passar mais tempo juntos e a nos conhecer melhor. 
-              O sentimento foi crescendo e foi em 03.12.2023 que começamos a nossa história juntos. 
-              E o Henrique ouviu o primeiro “sim” que ele queria ouvir.
-              <br />
-              <br />
-              Passamos por muitos momentos felizes, de aprendizado e de muito companheirismo um com o outro nesse período. 
-              A admiração, o carinho, o respeito e principalmente o nosso amor foi aumentando tanto, que estávamos certos de que queríamos dividir nossa vida um com o outro!
-              <br/>
-              <br/>
-              Então, no dia 03.04.2026, o Henrique recebeu o ’Sim’, que ele mais queria ouvir naquele momento! 
-              Foi o dia mais feliz na vida da Mariana até hoje.
-              Oficialmente noivos!
-              <br/>
-              <br/>
-              Agora estamos nos preparando para um dos dias mais especiais de nossas vidas, e gostaríamos muito de dividir isso com você!
-            </p>
-          </LiquidGlassWrapper>
+              Nossa história começou ainda na adolescência, quando nos conhecemos, e por alguns anos nossos caminhos continuaram se cruzando em encontros e eventos de amigos em comum. Nossa amizade foi crescendo em 2023, quando decidimos nos conhecer melhor.
+              <br /><br />
+              Essa proximidade, e a admiração mútua, nos deu a certeza de um sentimento que haviamos desenvolvido, o amor um pelo outro, e no dia 03 de dezembro de 2023, decidimos abrir espaço para esse sentimento florecer, e começamos a namorar.
+              <br /><br />
+              Desde então, constuímos uma história repleta de alegrias, aprendizados, cumplicidade e companheirismo. A cada dia, nossa admiração, nosso respeito, e nosso amor se tornaram ainda maiores, trazendo a certeza de que queríamos muito mais do que compartilhar momentos: queríamos compartilhar a vida.
+              <br /><br />
+              E foi assim que, no dia 03 de abril de 2026, chegou o momento de dar mais um passo nessa história. Henrique ouviu o tão sonhado “sim” mais uma vez — dessa vez, o que selou a promessa de um futuro juntos. Para Mariana, foi o dia mais feliz de sua vida até então.
+              Oficialmente, noivos! 💍
+              <br /><br />
+              Agora, estamos nos preparando para viver um dos dias mais especiais das nossas vidas: o dia em que celebraremos nosso amor ao lado das pessoas que fazem parte da nossa história.
+              E, para tornar esse momento ainda mais inesquecível, queremos muito ter você conosco!
 
-          {/* Assinatura */}
-          <div className="mt-6 text-center sm:mt-8">
-            <p
-              className="
+            </p>
+
+            {/* Assinatura */}
+            <div className="mt-6 text-end sm:mt-8">
+              <p
+                className="
                 font-cormorant
                 text-sm text-primary-light
                 sm:text-base
               "
-            >
-              Com muito amor,
-            </p>
+              >
+                Com muito amor,
+              </p>
 
-            <h3
-              className="
+              <h3
+                className="
                 font-bickham-script-pro-regular
                 text-4xl font-bold
                 text-primary-light
                 sm:text-5xl
                 md:text-6xl
               "
-            >
-              Mariana e Henrique
-            </h3>
-          </div>
+              >
+                Mariana e Henrique
+              </h3>
+            </div>
+          </LiquidGlassWrapper>
         </div>
       </div>
     </section>

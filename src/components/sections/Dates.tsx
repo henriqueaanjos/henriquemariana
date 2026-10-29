@@ -7,7 +7,7 @@ const dates = [
     id: "01",
     date: "03 dez 2023",
     title: "O Início da História",
-    image: "/photos/noivado/AYM_8333.jpg",
+    image: "/AYM_8333_5.jpg",
     description:
       "Foi aqui que nossa história começou. O primeiro capítulo de tudo o que ainda estava por vir.",
   },
@@ -15,7 +15,7 @@ const dates = [
     id: "02",
     date: "03 abr 2026",
     title: 'O "Sim"',
-    image: "/photos/noivado/AYM_8993.jpg",
+    image: "/AYM_8993_2.jpg",
     description:
       "Um momento que transformou nossa história e nos trouxe ainda mais perto do próximo capítulo.",
   },
@@ -23,7 +23,7 @@ const dates = [
     id: "03",
     date: "09 jan 2027",
     title: "O Próximo Passo",
-    image: "/photos/noivado/AYM_8721-2.jpg",
+    image: "/AYM_8724_1.jpg",
     description:
       "O dia em que diremos sim para uma vida inteira juntos.",
   },
@@ -36,7 +36,6 @@ export default function Dates() {
       className="
         relative w-full
         min-h-svh
-        snap-start
         overflow-hidden
         bg-background
       "

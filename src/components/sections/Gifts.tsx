@@ -82,7 +82,7 @@ function PixModal() {
       {/* DADOS */}
       <div className="mb-1 flex flex-col items-center gap-1 sm:mb-4">
         <p className="text-center font-lora text-sm font-bold text-primary-light/70">
-          Mariana de Araújo Feitosa
+          Mariana de Araujo Feitosa
         </p>
         <p className="text-center font-lora text-sm font-bold text-primary-light/70">
           Banco Itaú
@@ -240,7 +240,7 @@ export function Gifts() {
   return (
     <section
       id="gifts"
-      className="relative flex min-h-svh w-full snap-start flex-col items-center overflow-x-hidden bg-[url('/AYM_8552.jpeg')] bg-[70%_center] bg-cover sm:bg-top bg-no-repeat px-4 pt-28 pb-10 sm:px-6 sm:pt-32 sm:pb-12 md:px-8 lg:h-screen lg:min-h-0 lg:px-8 lg:pt-36 lg:pb-14"
+      className="relative flex min-h-svh w-full flex-col items-center overflow-x-hidden bg-[url('/AYM_8552.jpeg')] bg-[70%_center] bg-cover sm:bg-top bg-no-repeat px-4 pt-28 pb-10 sm:px-6 sm:pt-32 sm:pb-12 md:px-8 lg:h-screen lg:min-h-0 lg:px-8 lg:pt-36 lg:pb-14"
     >
       <div className="absolute inset-0 z-0 bg-linear-to-t from-olive-900/90 to-olive-900/10 to-65%" />
 
@@ -334,12 +334,12 @@ export function Gifts() {
                 imageAlt="Sotto Design"
                 description="Móveis e detalhes para o nosso cantinho."
               />
-              <CardGifts
+              {/* <CardGifts
                 href=""
                 imageSrc="/Havan_logo.svg"
                 imageAlt="Havan"
                 description="Utensílios e detalhes para a nossa casa."
-              />
+              /> */}
               <CardGifts
                 href=""
                 imageSrc="/mmartan-seeklogo.svg"

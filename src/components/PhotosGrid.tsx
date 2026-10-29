@@ -9,12 +9,12 @@ import { NewPhotoModal } from "./Modals/NewPhoto";
 import { PhotoLightbox } from "./PhotoLightbox";
 
 const galleryPhotos = [
-  "/GALERY/AYM_8437.JPG",
-  "/GALERY/AYM_8358.JPG",
-  "/GALERY/AYM_8753.JPG",
-  "/GALERY/AYM_8724.JPG",
-  "/GALERY/AYM_9042.JPG",
-  "/GALERY/AYM_8485.JPG",
+  "/Gallery_1.JPG",
+  "/Gallery_2.JPG",
+  "/Gallery_3.JPG",
+  "/Gallery_4.JPG",
+  "/Gallery_5.JPG",
+  "/Gallery_6.JPG",
 ];
 
 export function PhotosGrid() {

@@ -8,12 +8,10 @@ export function Hero() {
       className="
         relative flex
         min-h-[100svh] w-full
-        snap-start
-        bg-[url('/AYM_8379_3.jpeg')]
+        bg-[url('/AYM_8379_8.jpg')]
         bg-cover bg-no-repeat
         overflow-hidden
-        bg-[49%_center]
-        sm:bg-[50%_center]
+        bg-center
       "
     >
       {/* Gradiente para melhorar a legibilidade */}
@@ -71,14 +69,14 @@ export function Hero() {
               text-primary-dark
               text-xl
               sm:text-2xl
-              xl:text-4xl
+              lg:text-4xl
             "
           >
             09.01.2027
           </h5>
         </div>
 
-        <div className="w-full max-w-full mt-14 sm:mt-0">
+        <div className="w-full max-w-full mt-14 sm:mt-10 md:mt-0 lg:-mt-2 xl:-mt-8">
           <Countdown />
         </div>
       </div>

@@ -15,7 +15,6 @@ export function Information() {
       className="
         relative flex min-h-svh w-full flex-col
         items-center justify-center
-        snap-start snap-always
         overflow-hidden
         bg-background
         bg-[url('/AYM_8791-2.jpeg')]
@@ -158,7 +157,7 @@ export function Information() {
                 </p>
 
                 <p className="mt-1 font-lora text-xs leading-relaxed text-primary-light/60 sm:text-sm">
-                  Evitem jeans, macacões ou trajes casuais.
+                  Evitem jeans, macacões ou trajes casuais. É indicado o uso de vestidos de festa longos ou roupa social.
                 </p>
               </div>
             </LiquidGlassWrapper>
@@ -177,7 +176,7 @@ export function Information() {
                 </p>
 
                 <p className="mt-1 font-lora text-xs leading-relaxed text-primary-light/60 sm:text-sm">
-                  Pedimos, com carinho, que guardem os celulares nesse momento.
+                  Pedimos que guardem os celulares nesse momento.
                 </p>
               </div>
             </LiquidGlassWrapper>
@@ -197,7 +196,8 @@ export function Information() {
 
                 <p className="mt-1 font-lora text-xs leading-relaxed text-primary-light/60 sm:text-sm">
                   Branco, off-white, marfim e tons muito claros ficam
-                  reservados para a noiva.
+                  reservados para a noiva. 
+                  <br/>As madrinhas usarão verde oliva.
                 </p>
               </div>
             </LiquidGlassWrapper>

@@ -10,7 +10,7 @@ export function LiquidGlassWrapper({ children, className, isGlassEffect = true }
     const roundedClass = className?.split(" ").find((className) => className.startsWith("rounded-"));
     return (
         <div className={`${className} relative flex font-semibold overflow-hidden text-black cursor-pointer ${roundedClass ?? "rounded-4xl"} ${isGlassEffect ? "shadow-lg" : "shadow-none"} transition-all duration-400 ease-in-out `}>
-            <svg style={{ display: "none" }}>
+            {/* <svg style={{ display: "none" }}>
                 <filter
                     id="glass-distortion"
                     x="0%"
@@ -64,7 +64,7 @@ export function LiquidGlassWrapper({ children, className, isGlassEffect = true }
                         yChannelSelector="G"
                     />
                 </filter>
-            </svg>
+            </svg> */}
             <div
                 className={`w-full h-full absolute z-0 inset-0 ${isGlassEffect && "backdrop-blur-xs"}  transition-all duration-500 overflow-hidden isolate `}
                 style={{

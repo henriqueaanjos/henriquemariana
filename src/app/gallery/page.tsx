@@ -98,12 +98,13 @@ export default function GalleryPage() {
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,var(--color-primary)_0%,transparent_45%)] opacity-40"
         />
 
+
         {/* HEADER */}
-        <div className="relative z-10 mt-4 grid w-full grid-cols-[1fr_auto] items-center gap-x-3 gap-y-4 sm:mt-6 sm:grid-cols-[1fr_auto_1fr] lg:mt-8">
+        <header className="relative z-10 mt-4 flex w-full items-center justify-between sm:mt-6 lg:mt-8">
           {/* VOLTAR */}
-          <div className="flex justify-start">
+          <div className="relative z-10 flex w-fit shrink-0">
             <Button
-              className="flex flex-row items-center gap-1.5 px-2 sm:gap-2 sm:px-3"
+              className="!w-fit !min-w-0 inline-flex shrink-0 flex-row items-center justify-center gap-1.5 px-2 sm:gap-2 sm:px-3"
               onClick={handleBack}
               variant="secondary"
             >
@@ -112,26 +113,23 @@ export default function GalleryPage() {
                 className="shrink-0 text-primary-dark sm:size-6"
               />
 
-              <span className="font-lora text-xs font-light uppercase text-primary-dark sm:text-sm">
-                Voltar
-                {selectedAlbum.album
-                  ? " para Álbuns"
-                  : " para a página"}
+              <span className="hidden whitespace-nowrap font-lora text-sm font-light uppercase text-primary-dark sm:inline">
+                Voltar{selectedAlbum.album ? " para Álbuns" : " para a página"}
               </span>
             </Button>
           </div>
 
-          {/* TÍTULO */}
-          <div className="col-span-2 row-start-2 justify-self-center border-b-2 border-primary px-2 pb-1 sm:col-span-1 sm:col-start-2 sm:row-start-1">
+          {/* TÍTULO CENTRALIZADO */}
+          <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border-b-2 border-primary px-2 pb-1">
             <h1 className="whitespace-nowrap text-center font-cormorant text-2xl font-bold uppercase text-primary-dark sm:text-3xl">
               {selectedAlbum.album || "Galeria"}
             </h1>
           </div>
 
           {/* ADICIONAR FOTOS */}
-          <div className="col-start-2 row-start-1 flex justify-end sm:col-start-3">
+          <div className="relative z-10 flex w-fit shrink-0 rounded-full sm:rounded-none">
             <Button
-              className="flex flex-row items-center gap-1.5 px-2 sm:gap-2 sm:px-3"
+              className="!w-fit !min-w-0 inline-flex shrink-0 flex-row items-center justify-center gap-1.5 px-2 sm:gap-2 sm:px-3 "
               onClick={handleOpenModal}
             >
               <PlusIcon
@@ -139,15 +137,13 @@ export default function GalleryPage() {
                 className="shrink-0 text-background sm:size-6"
               />
 
-              <span className="whitespace-nowrap font-lora text-[10px] font-light uppercase text-background sm:text-sm">
-                <span className="sm:hidden">Adicionar</span>
-                <span className="hidden sm:inline">
-                  Adicionar fotos
-                </span>
+              <span className="hidden whitespace-nowrap font-lora text-sm font-light uppercase text-background sm:inline">
+                Adicionar fotos
               </span>
             </Button>
           </div>
-        </div>
+        </header>
+
 
         {/* ÁLBUNS */}
         {!selectedAlbum.album ? (

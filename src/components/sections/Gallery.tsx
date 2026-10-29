@@ -7,7 +7,7 @@ export function Gallery() {
         <section
             id="gallery"
             className="
-        relative flex min-h-svh w-full snap-start flex-col
+        relative flex min-h-svh w-full flex-col
         items-center overflow-hidden
         bg-[url('/AYM_8721.JPG')] bg-cover bg-top bg-no-repeat
         px-4 pt-28 pb-8

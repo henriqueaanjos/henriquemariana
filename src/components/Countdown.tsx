@@ -17,16 +17,15 @@ export function Countdown() {
   ];
 
   return (
-    <div className="flex flex-col items-center justify-center px-6">
+    <div className="flex flex-col items-center justify-center">
       <div
         className="
         flex flex-row items-center justify-center
-        gap-1.5
+        gap-0.5
         text-primary-dark
-        sm:gap-2
-        md:gap-2
         rounded-full
         bg-background/70
+        p-0
       "
       >
         {units.map((unit, index) => (
@@ -35,17 +34,17 @@ export function Countdown() {
               className="
               flex flex-col items-center
               font-cormorant
-              min-w-[2.5rem]
-              sm:min-w-[3rem]
-              md:min-w-[3.5rem]
+              px-4
+              py-1
             "
             >
               <span
                 className="
                 text-2xl leading-tight
-                sm:text-3xl
-                md:text-4xl
-                lg:text-4xl
+                sm:text-1xl
+                md:text-1.5xl
+                lg:text-2xl
+                xl:text-3xl
               "
               >
                 {unit.value}
@@ -53,10 +52,10 @@ export function Countdown() {
 
               <span
                 className="
-                text-xs
-                sm:text-sm
-                md:text-base
-                lg:text-lg
+                text-[8px]
+                sm:text-[10px]
+                md:text-xs
+                lg:text-sm
               "
               >
                 {unit.label}

@@ -7,7 +7,7 @@ export function Playlist() {
     <section
       id="playlist"
       className="
-        relative flex min-h-svh w-full snap-start flex-col
+        relative flex min-h-svh w-full flex-col
         items-center overflow-hidden
         bg-[url('/AYM_9074_1.jpeg')] bg-cover bg-no-repeat
         px-4 pt-28 pb-8

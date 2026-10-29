@@ -169,7 +169,7 @@ export default function Home() {
         >
           <Header />
 
-          <div className="snap-y snap-mandatory">
+          <div className="lg:snap-y lg:snap-mandatory">
             <div className="snap-none lg:snap-start">
               <Hero />
             </div>
