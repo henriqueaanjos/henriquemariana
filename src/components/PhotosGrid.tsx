@@ -9,7 +9,7 @@ import { NewPhotoModal } from "./Modals/NewPhoto";
 import { PhotoLightbox } from "./PhotoLightbox";
 
 const galleryPhotos = [
-  "/Gallery_1.JPG",
+  "/Gallery_1.jpg",
   "/Gallery_2.JPG",
   "/Gallery_3.JPG",
   "/Gallery_4.JPG",

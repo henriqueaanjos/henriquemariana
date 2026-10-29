@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -5,8 +6,8 @@ import {
   ArrowRightIcon,
   XIcon,
 } from "@phosphor-icons/react";
-import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
+import { createPortal } from "react-dom";
 import { useEffect, useState } from "react";
 
 interface PhotoLightboxProps {
@@ -21,12 +22,10 @@ const slideVariants = {
     opacity: 0,
     x: direction > 0 ? 80 : -80,
   }),
-
   center: {
     opacity: 1,
     x: 0,
   },
-
   exit: (direction: number) => ({
     opacity: 0,
     x: direction > 0 ? -80 : 80,
@@ -40,118 +39,126 @@ export function PhotoLightbox({
   onChange,
 }: PhotoLightboxProps) {
   const isOpen = selectedIndex !== null;
-
+  const [mounted, setMounted] = useState(false);
   const [direction, setDirection] = useState(1);
 
+  // Evita acessar document durante a renderização no servidor.
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   function handlePrevious() {
-    if (selectedIndex === null || photos.length === 0) {
-      return;
-    }
+    if (selectedIndex === null || photos.length === 0) return;
 
     setDirection(-1);
 
     const previousIndex =
-      selectedIndex === 0
-        ? photos.length - 1
-        : selectedIndex - 1;
+      selectedIndex === 0 ? photos.length - 1 : selectedIndex - 1;
 
     onChange(previousIndex);
   }
 
   function handleNext() {
-    if (selectedIndex === null || photos.length === 0) {
-      return;
-    }
+    if (selectedIndex === null || photos.length === 0) return;
 
     setDirection(1);
 
     const nextIndex =
-      selectedIndex === photos.length - 1
-        ? 0
-        : selectedIndex + 1;
+      selectedIndex === photos.length - 1 ? 0 : selectedIndex + 1;
 
     onChange(nextIndex);
   }
 
+  // Bloqueia a rolagem da página e controla os atalhos do teclado.
   useEffect(() => {
     if (!isOpen) return;
 
+    document.body.style.overflow = "hidden";
+
     function handleKeyDown(event: KeyboardEvent) {
-      switch (event.key) {
-        case "Escape":
-          onClose();
-          break;
+      if (event.key === "Escape") {
+        onClose();
+      }
 
-        case "ArrowLeft":
-          handlePrevious();
-          break;
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        handlePrevious();
+      }
 
-        case "ArrowRight":
-          handleNext();
-          break;
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        handleNext();
       }
     }
 
-    window.addEventListener(
-      "keydown",
-      handleKeyDown,
-    );
-
-    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown,
-      );
-
+      window.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
     };
-  }, [
-    isOpen,
-    selectedIndex,
-    photos.length,
-  ]);
+  }, [isOpen, selectedIndex, photos.length, onClose, onChange]);
 
-  return (
+  // O portal tira o lightbox das camadas de posicionamento da galeria.
+  if (!mounted) return null;
+
+  return createPortal(
     <AnimatePresence>
-      {isOpen && selectedIndex !== null && (
+      {isOpen && selectedIndex !== null && photos[selectedIndex] && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
-          className="fixed inset-0 z-999 flex h-screen w-screen items-center justify-center bg-black/80 p-4 backdrop-blur-md"
+          className="
+            fixed inset-0 z-[9999]
+            flex h-[100dvh] w-screen
+            items-center justify-center
+            overflow-hidden bg-black/85
+            p-4 backdrop-blur-md
+          "
           onClick={onClose}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Visualização de fotos"
         >
-          {/* CONTADOR */}
-
-          <div className="absolute left-1/2 top-6 z-30 -translate-x-1/2 rounded-full border border-white/10 bg-black/30 px-4 py-2 backdrop-blur-md">
-            <p className="font-lora text-[11px] tracking-[0.12em] text-white/70">
-              {String(selectedIndex + 1).padStart(2, "0")}
-              {" / "}
-              {String(photos.length).padStart(2, "0")}
-            </p>
+          {/* Contador de fotos */}
+          <div
+            className="
+              absolute left-1/2 top-5 z-30
+              -translate-x-1/2 rounded-full
+              border border-white/20 bg-black/40
+              px-4 py-2 font-lora text-sm
+              text-white backdrop-blur-md
+            "
+          >
+            {selectedIndex + 1} / {photos.length}
           </div>
 
-          {/* FECHAR */}
-
+          {/* Botão fechar */}
           <button
             type="button"
-            aria-label="Fechar"
-            onClick={onClose}
-            className="absolute right-5 top-5 z-30 flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/30 text-white/80 backdrop-blur-md transition-all hover:bg-white/10 hover:text-white"
+            onClick={(event) => {
+              event.stopPropagation();
+              onClose();
+            }}
+            className="
+              absolute right-4 top-4 z-40
+              flex size-11 items-center justify-center
+              rounded-full border border-white/20
+              bg-black/40 text-white
+              transition hover:bg-white/20
+              sm:right-6 sm:top-6
+            "
+            aria-label="Fechar galeria"
           >
-            <XIcon size={20} />
+            <XIcon size={24} weight="bold" />
           </button>
 
-          {/* FOTO */}
-
+          {/* Área da foto */}
           <div
             className="relative flex h-full w-full items-center justify-center"
-            onClick={(event) =>
-              event.stopPropagation()
-            }
+            onClick={(event) => event.stopPropagation()}
           >
             <AnimatePresence
               initial={false}
@@ -166,49 +173,75 @@ export function PhotoLightbox({
                 animate="center"
                 exit="exit"
                 transition={{
-                  duration: 0.32,
-                  ease: [0.22, 1, 0.36, 1],
+                  opacity: { duration: 0.2 },
+                  x: { duration: 0.25 },
                 }}
-                className="absolute inset-0 flex items-center justify-center"
+                className="
+                  absolute inset-0
+                  flex items-center justify-center
+                "
               >
                 <img
                   src={photos[selectedIndex]}
-                  alt={`Foto ${selectedIndex + 1}`}
+                  alt={`Foto ${selectedIndex + 1} de ${photos.length}`}
+                  className="
+                    max-h-full max-w-full
+                    select-none object-contain
+                  "
                   draggable={false}
-                  className="max-h-[85vh] max-w-[92vw] select-none object-contain"
-                  onClick={(event) => event.stopPropagation()}
                 />
               </motion.div>
             </AnimatePresence>
 
-            {/* ANTERIOR */}
-
+            {/* Foto anterior */}
             {photos.length > 1 && (
               <button
                 type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handlePrevious();
+                }}
+                className="
+                  absolute left-0 top-1/2 z-30
+                  flex size-11 -translate-y-1/2
+                  items-center justify-center
+                  rounded-full border border-white/20
+                  bg-black/40 text-white
+                  transition hover:bg-white/20
+                  sm:left-2 sm:size-12
+                "
                 aria-label="Foto anterior"
-                onClick={handlePrevious}
-                className="absolute left-2 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-black/30 text-white/80 backdrop-blur-md transition-all hover:bg-white/10 hover:text-white sm:left-5"
               >
-                <ArrowLeftIcon size={21} />
+                <ArrowLeftIcon size={24} weight="bold" />
               </button>
             )}
 
-            {/* PRÓXIMA */}
-
+            {/* Próxima foto */}
             {photos.length > 1 && (
               <button
                 type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handleNext();
+                }}
+                className="
+                  absolute right-0 top-1/2 z-30
+                  flex size-11 -translate-y-1/2
+                  items-center justify-center
+                  rounded-full border border-white/20
+                  bg-black/40 text-white
+                  transition hover:bg-white/20
+                  sm:right-2 sm:size-12
+                "
                 aria-label="Próxima foto"
-                onClick={handleNext}
-                className="absolute right-2 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-black/30 text-white/80 backdrop-blur-md transition-all hover:bg-white/10 hover:text-white sm:right-5"
               >
-                <ArrowRightIcon size={21} />
+                <ArrowRightIcon size={24} weight="bold" />
               </button>
             )}
           </div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }
