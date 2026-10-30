@@ -2,7 +2,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const photosPath = path.join(process.cwd(), "public", "Photos");
+const photosPath = path.join(process.cwd(), "public", "photos");
 const outputPath = path.join(
   process.cwd(),
   "src",
