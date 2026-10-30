@@ -33,7 +33,7 @@ const albums = fs
       )
       .map(
         (file) =>
-          `/Photos/${encodeURIComponent(entry.name)}/${encodeURIComponent(file.name)}`,
+          `/photos/${encodeURIComponent(entry.name)}/${encodeURIComponent(file.name)}`,
       )
       .sort((a, b) => a.localeCompare(b));
 
