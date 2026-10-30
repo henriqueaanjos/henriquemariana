@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -14,6 +14,7 @@ import {
   User,
   UsersThree,
   X,
+  WhatsappLogo,
 } from "@phosphor-icons/react";
 import { motion } from "motion/react";
 import {
@@ -42,6 +43,29 @@ import {
   updateAdminRSVPFamilyMember,
 } from "@/src/services/admin-rsvp-family";
 
+// -----------------------------------------------------------------------------
+// Configurações
+// -----------------------------------------------------------------------------
+
+const DEFAULT_INVITE_TEMPLATE = `Olá, {{nome}}! 💛
+
+É com muito carinho que queremos compartilhar com você um momento muito especial das nossas vidas.
+
+Estamos preparando tudo com muito amor para celebrar o nosso casamento e seria uma alegria enorme ter você conosco nesse dia. ✨
+
+Para confirmar sua presença, acesse o nosso site:
+
+{{link}}
+
+O código de confirmação da família é: {{codigo}}
+
+Esperamos celebrar esse momento tão especial ao seu lado! 🥂
+
+Com carinho,
+Mariana & Henrique 🤍`;
+
+const INVITE_TEMPLATE_STORAGE_KEY = "admin-rsvp-invite-template";
+
 const statusConfig: Record<
   RSVPGuestStatus,
   {
@@ -67,6 +91,10 @@ const statusConfig: Record<
   },
 };
 
+// -----------------------------------------------------------------------------
+// Componentes auxiliares
+// -----------------------------------------------------------------------------
+
 function StatusBadge({ status }: { status: RSVPGuestStatus }) {
   const config = statusConfig[status];
   const Icon = config.icon;
@@ -81,20 +109,128 @@ function StatusBadge({ status }: { status: RSVPGuestStatus }) {
   );
 }
 
+function SummaryCard({
+  label,
+  value,
+  icon,
+  accent = false,
+}: {
+  label: string;
+  value: number;
+  icon: ReactNode;
+  accent?: boolean;
+}) {
+  return (
+    <motion.div
+      whileHover={{ y: -2 }}
+      className="rounded-[22px] border border-[#2c2925]/7 bg-white/45 p-4 sm:p-5"
+    >
+      <div className="flex items-center justify-between">
+        <div
+          className={`flex h-8 w-8 items-center justify-center rounded-full ${accent
+              ? "bg-[#6e4c12]/10 text-[#6e4c12]"
+              : "bg-[#2c2925]/5 text-[#2c2925]/40"
+            }`}
+        >
+          {icon}
+        </div>
+
+        <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#2c2925]/30">
+          RSVP
+        </span>
+      </div>
+
+      <p className="mt-5 font-serif text-3xl leading-none tracking-[-0.04em] text-[#2c2925]">
+        {value}
+      </p>
+
+      <p className="mt-1.5 text-[10px] font-medium uppercase tracking-[0.12em] text-[#2c2925]/35">
+        {label}
+      </p>
+    </motion.div>
+  );
+}
+
+function InfoRow({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4 border-b border-[#2c2925]/6 pb-3 last:border-0 last:pb-0">
+      <span className="text-[10px] font-medium uppercase tracking-widest text-[#2c2925]/35">
+        {label}
+      </span>
+
+      <span className="text-right text-xs font-medium text-[#2c2925]/70">
+        {value}
+      </span>
+    </div>
+  );
+}
+
+// -----------------------------------------------------------------------------
+// Página
+// -----------------------------------------------------------------------------
+
 export default function RSVPFamilyPage() {
   const [copied, setCopied] = useState(false);
+
   const [isAddGuestOpen, setIsAddGuestOpen] = useState(false);
   const [isEditFamilyOpen, setIsEditFamilyOpen] = useState(false);
+
   const [editingGuest, setEditingGuest] =
     useState<AdminRSVPFamilyGuest | null>(null);
+
   const [deletingGuest, setDeletingGuest] =
     useState<AdminRSVPFamilyGuest | null>(null);
+
   const [isDeleteFamilyOpen, setIsDeleteFamilyOpen] = useState(false);
+
+  const [inviteTemplate, setInviteTemplate] = useState(
+    DEFAULT_INVITE_TEMPLATE,
+  );
+
+  const [templateSaved, setTemplateSaved] = useState(false);
 
   const params = useParams();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const familyId = String(params.familyId);
+
+  // ---------------------------------------------------------------------------
+  // Modelo de mensagem
+  // ---------------------------------------------------------------------------
+
+  useEffect(() => {
+    const savedTemplate = localStorage.getItem(
+      INVITE_TEMPLATE_STORAGE_KEY,
+    );
+
+    if (savedTemplate !== null) {
+      setInviteTemplate(savedTemplate);
+    }
+  }, []);
+
+  function handleSaveTemplate() {
+    localStorage.setItem(
+      INVITE_TEMPLATE_STORAGE_KEY,
+      inviteTemplate,
+    );
+
+    setTemplateSaved(true);
+
+    window.setTimeout(() => {
+      setTemplateSaved(false);
+    }, 1800);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Busca da família
+  // ---------------------------------------------------------------------------
 
   const {
     data: family,
@@ -106,11 +242,18 @@ export default function RSVPFamilyPage() {
     enabled: Boolean(familyId),
   });
 
-  const queryClient = useQueryClient();
+  // ---------------------------------------------------------------------------
+  // Mutations
+  // ---------------------------------------------------------------------------
 
   const addGuestMutation = useMutation({
-    mutationFn: (name: string) =>
-      createAdminRSVPFamilyMember(familyId, name),
+    mutationFn: ({
+      name,
+      phone,
+    }: {
+      name: string;
+      phone: string;
+    }) => createAdminRSVPFamilyMember(familyId, name, phone),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -147,19 +290,18 @@ export default function RSVPFamilyPage() {
       memberId,
       name,
       status,
+      phone,
     }: {
       memberId: string;
       name: string;
       status: RSVPGuestStatus;
+      phone: string;
     }) =>
-      updateAdminRSVPFamilyMember(
-        familyId,
-        memberId,
-        {
-          name,
-          status,
-        },
-      ),
+      updateAdminRSVPFamilyMember(familyId, memberId, {
+        name,
+        status,
+        phone: phone || null,
+      }),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -176,10 +318,7 @@ export default function RSVPFamilyPage() {
 
   const deleteGuestMutation = useMutation({
     mutationFn: (memberId: string) =>
-      deleteAdminRSVPFamilyMember(
-        familyId,
-        memberId,
-      ),
+      deleteAdminRSVPFamilyMember(familyId, memberId),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -195,8 +334,7 @@ export default function RSVPFamilyPage() {
   });
 
   const deleteFamilyMutation = useMutation({
-    mutationFn: () =>
-      deleteAdminRSVPFamily(familyId),
+    mutationFn: () => deleteAdminRSVPFamily(familyId),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -213,6 +351,10 @@ export default function RSVPFamilyPage() {
     },
   });
 
+  // ---------------------------------------------------------------------------
+  // Formatação
+  // ---------------------------------------------------------------------------
+
   function formatDateTime(date: string) {
     return new Intl.DateTimeFormat("pt-BR", {
       dateStyle: "short",
@@ -220,95 +362,9 @@ export default function RSVPFamilyPage() {
     }).format(new Date(date));
   }
 
-  if (isLoading) {
-    return (
-      <AdminShell>
-        <div className="pb-10">
-          <div className="mb-8">
-            <div className="h-4 w-24 animate-pulse rounded bg-[#2c2925]/5" />
-
-            <div className="mt-5 h-12 w-72 animate-pulse rounded-xl bg-[#2c2925]/5" />
-
-            <div className="mt-4 h-6 w-48 animate-pulse rounded-full bg-[#2c2925]/5" />
-          </div>
-
-          <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <div
-                key={index}
-                className="h-28 animate-pulse rounded-[22px] bg-[#2c2925]/5"
-              />
-            ))}
-          </div>
-
-          <div className="grid gap-5 xl:grid-cols-[1fr_360px]">
-            <div className="h-[420px] animate-pulse rounded-[26px] bg-[#2c2925]/5" />
-
-            <div className="space-y-5">
-              <div className="h-72 animate-pulse rounded-[26px] bg-[#2c2925]/5" />
-              <div className="h-64 animate-pulse rounded-[26px] bg-[#2c2925]/5" />
-            </div>
-          </div>
-        </div>
-      </AdminShell>
-    );
-  }
-
-  if (isError || !family) {
-    return (
-      <AdminShell>
-        <div className="flex min-h-[60vh] flex-col items-center justify-center text-center">
-          <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[#2c2925]/5">
-            <UsersThree
-              size={24}
-              className="text-[#2c2925]/40"
-            />
-          </div>
-
-          <h1 className="font-serif text-3xl text-[#2c2925]">
-            Família não encontrada
-          </h1>
-
-          <p className="mt-2 max-w-md text-sm leading-6 text-[#2c2925]/45">
-            A família que você tentou acessar não existe ou não está mais
-            disponível.
-          </p>
-
-          <button
-            type="button"
-            onClick={() => router.push("/admin/rsvp")}
-            className="mt-6 inline-flex h-10 items-center gap-2 rounded-full bg-[#2c2925] px-5 text-xs font-medium text-white transition-transform hover:-translate-y-0.5"
-          >
-            <ArrowLeft size={14} />
-            Voltar para convidados
-          </button>
-        </div>
-      </AdminShell>
-    );
-  }
-
-  const confirmed = family.guests.filter(
-    (guest) => guest.status === "confirmed",
-  ).length;
-
-  const pending = family.guests.filter(
-    (guest) => guest.status === "pending",
-  ).length;
-
-  const declined = family.guests.filter(
-    (guest) => guest.status === "declined",
-  ).length;
-
-  const total = family.guests.length;
-
-  const familyStatus =
-    total > 0 && confirmed === total
-      ? "Todos confirmados"
-      : total > 0 &&
-          confirmed === 0 &&
-          declined === total
-        ? "Recusado"
-        : "Resposta parcial";
+  // ---------------------------------------------------------------------------
+  // Copiar informações
+  // ---------------------------------------------------------------------------
 
   async function handleCopyCode() {
     if (!family) return;
@@ -366,6 +422,172 @@ Mariana & Henrique 🤍`;
       setCopied(false);
     }, 1800);
   }
+
+  // ---------------------------------------------------------------------------
+  // Convite individual pelo WhatsApp
+  // ---------------------------------------------------------------------------
+
+  function normalizeBrazilianPhone(phone: string) {
+    const digits = phone.replace(/\D/g, "");
+
+    // Remove o DDI 55 quando ele já estiver presente.
+    const nationalNumber =
+      digits.startsWith("55") &&
+        (digits.length === 12 || digits.length === 13)
+        ? digits.slice(2)
+        : digits;
+
+    // Telefone brasileiro: DDD + número (10 ou 11 dígitos).
+    if (
+      nationalNumber.length !== 10 &&
+      nationalNumber.length !== 11
+    ) {
+      return null;
+    }
+
+    return `55${nationalNumber}`;
+  }
+
+  function handleWhatsAppInvite(guest: AdminRSVPFamilyGuest) {
+    if (!family) return;
+
+    if (!guest.phone) {
+      setEditingGuest(guest);
+      return;
+    }
+
+    const phone = normalizeBrazilianPhone(guest.phone);
+
+    if (!phone) {
+      alert(
+        `O telefone de ${guest.name} está inválido. Atualize o número antes de enviar o convite.`,
+      );
+
+      setEditingGuest(guest);
+      return;
+    }
+
+    
+const link = `${window.location.origin}/rsvp/${family.code}`;
+
+const message = inviteTemplate
+  .replaceAll("{{familia}}", family.name)
+  .replaceAll("{{nome}}", guest.name)
+  .replaceAll("{{codigo}}", family.code)
+  .replaceAll("{{link}}", link);
+
+const whatsappUrl = new URL(`https://wa.me/${phone}`);
+whatsappUrl.searchParams.set("text", message);
+
+window.open(whatsappUrl.toString(), "_blank", "noopener,noreferrer");
+
+  }
+
+  // ---------------------------------------------------------------------------
+  // Loading
+  // ---------------------------------------------------------------------------
+
+  if (isLoading) {
+    return (
+      <AdminShell>
+        <div className="pb-10">
+          <div className="mb-8">
+            <div className="h-4 w-24 animate-pulse rounded bg-[#2c2925]/5" />
+
+            <div className="mt-5 h-12 w-72 animate-pulse rounded-xl bg-[#2c2925]/5" />
+
+            <div className="mt-4 h-6 w-48 animate-pulse rounded-full bg-[#2c2925]/5" />
+          </div>
+
+          <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div
+                key={index}
+                className="h-28 animate-pulse rounded-[22px] bg-[#2c2925]/5"
+              />
+            ))}
+          </div>
+
+          <div className="grid gap-5 xl:grid-cols-[1fr_360px]">
+            <div className="h-[420px] animate-pulse rounded-[26px] bg-[#2c2925]/5" />
+
+            <div className="space-y-5">
+              <div className="h-72 animate-pulse rounded-[26px] bg-[#2c2925]/5" />
+              <div className="h-64 animate-pulse rounded-[26px] bg-[#2c2925]/5" />
+            </div>
+          </div>
+        </div>
+      </AdminShell>
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Error
+  // ---------------------------------------------------------------------------
+
+  if (isError || !family) {
+    return (
+      <AdminShell>
+        <div className="flex min-h-[60vh] flex-col items-center justify-center text-center">
+          <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[#2c2925]/5">
+            <UsersThree
+              size={24}
+              className="text-[#2c2925]/40"
+            />
+          </div>
+
+          <h1 className="font-serif text-3xl text-[#2c2925]">
+            Família não encontrada
+          </h1>
+
+          <p className="mt-2 max-w-md text-sm leading-6 text-[#2c2925]/45">
+            A família que você tentou acessar não existe ou não está mais
+            disponível.
+          </p>
+
+          <button
+            type="button"
+            onClick={() => router.push("/admin/rsvp")}
+            className="mt-6 inline-flex h-10 items-center gap-2 rounded-full bg-[#2c2925] px-5 text-xs font-medium text-white transition-transform hover:-translate-y-0.5"
+          >
+            <ArrowLeft size={14} />
+            Voltar para convidados
+          </button>
+        </div>
+      </AdminShell>
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Estatísticas
+  // ---------------------------------------------------------------------------
+
+  const confirmed = family.guests.filter(
+    (guest) => guest.status === "confirmed",
+  ).length;
+
+  const pending = family.guests.filter(
+    (guest) => guest.status === "pending",
+  ).length;
+
+  const declined = family.guests.filter(
+    (guest) => guest.status === "declined",
+  ).length;
+
+  const total = family.guests.length;
+
+  const familyStatus =
+    total > 0 && confirmed === total
+      ? "Todos confirmados"
+      : total > 0 &&
+        confirmed === 0 &&
+        declined === total
+        ? "Recusado"
+        : "Resposta parcial";
+
+  // ---------------------------------------------------------------------------
+  // Renderização
+  // ---------------------------------------------------------------------------
 
   return (
     <AdminShell>
@@ -483,7 +705,7 @@ Mariana & Henrique 🤍`;
         </div>
 
         <div className="grid gap-5 xl:grid-cols-[1fr_360px]">
-          {/* Guests */}
+          {/* Lista de convidados */}
           <section className="overflow-hidden rounded-[26px] border border-[#2c2925]/7 bg-white/45">
             <div className="flex flex-col gap-4 border-b border-[#2c2925]/7 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
               <div>
@@ -518,51 +740,91 @@ Mariana & Henrique 🤍`;
                   }}
                   className="group flex flex-col gap-4 px-5 py-5 transition-colors hover:bg-white/55 sm:flex-row sm:items-center sm:justify-between sm:px-6"
                 >
-                  <div className="flex items-center gap-3.5">
+                  <div className="flex min-w-0 items-center gap-3.5">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#2c2925]/5 text-[#2c2925]/45">
                       <User size={17} />
                     </div>
 
-                    <div>
-                      <p className="text-sm font-medium text-[#2c2925]">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-[#2c2925]">
                         {guest.name}
                       </p>
 
                       <p className="mt-0.5 text-[11px] text-[#2c2925]/35">
                         Convidado #{String(index + 1).padStart(2, "0")}
                       </p>
+
+                      {guest.phone ? (
+                        <p className="mt-1 text-[11px] text-[#2c2925]/45">
+                          {guest.phone}
+                        </p>
+                      ) : (
+                        <p className="mt-1 text-[11px] text-[#8d4b42]/70">
+                          Telefone não cadastrado
+                        </p>
+                      )}
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between gap-4 sm:justify-end">
+                  <div className="flex flex-wrap items-center justify-between gap-3 sm:justify-end">
                     <StatusBadge status={guest.status} />
 
-                    <button
-                      type="button"
-                      onClick={() => setEditingGuest(guest)}
-                      aria-label={`Editar ${guest.name}`}
-                      className="flex h-8 w-8 items-center justify-center rounded-full text-[#2c2925]/30 transition-colors hover:bg-[#2c2925]/5 hover:text-[#2c2925]"
-                    >
-                      <PencilSimple size={15} />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => handleWhatsAppInvite(guest)}
+                        aria-label={`Convidar ${guest.name} pelo WhatsApp`}
+                        title={
+                          guest.phone
+                            ? "Convidar pelo WhatsApp"
+                            : "Cadastrar telefone"
+                        }
+                        className="flex h-8 items-center gap-1.5 rounded-full bg-[#25D366]/10 px-3 text-[10px] font-semibold text-[#168B45] transition-colors hover:bg-[#25D366]/20"
+                      >
+                        <WhatsappLogo size={15} weight="fill" />
+                        WhatsApp
+                      </button>
 
-                    <button
-                      type="button"
-                      aria-label={`Excluir ${guest.name}`}
-                      onClick={() => setDeletingGuest(guest)}
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-[#A08D87] transition hover:bg-[#8D4B42]/[0.07] hover:text-[#8D4B42]"
-                    >
-                      <Trash size={15} />
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => setEditingGuest(guest)}
+                        aria-label={`Editar ${guest.name}`}
+                        className="flex h-8 w-8 items-center justify-center rounded-full text-[#2c2925]/30 transition-colors hover:bg-[#2c2925]/5 hover:text-[#2c2925]"
+                      >
+                        <PencilSimple size={15} />
+                      </button>
+
+                      <button
+                        type="button"
+                        aria-label={`Excluir ${guest.name}`}
+                        onClick={() => setDeletingGuest(guest)}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-[#A08D87] transition hover:bg-[#8D4B42]/[0.07] hover:text-[#8D4B42]"
+                      >
+                        <Trash size={15} />
+                      </button>
+                    </div>
                   </div>
                 </motion.div>
               ))}
+
+              {family.guests.length === 0 && (
+                <div className="px-6 py-12 text-center">
+                  <UsersThree
+                    size={28}
+                    className="mx-auto text-[#2c2925]/20"
+                  />
+
+                  <p className="mt-3 text-sm text-[#2c2925]/50">
+                    Nenhum convidado cadastrado nesta família.
+                  </p>
+                </div>
+              )}
             </div>
           </section>
 
-          {/* Sidebar information */}
+          {/* Sidebar */}
           <aside className="space-y-5">
-            {/* RSVP access */}
+            {/* Acesso RSVP */}
             <section className="rounded-[26px] border border-[#2c2925]/7 bg-[#2c2925] p-6 text-white">
               <div className="mb-7 flex items-start justify-between">
                 <div>
@@ -608,7 +870,7 @@ Mariana & Henrique 🤍`;
               </div>
             </section>
 
-            {/* Group information */}
+            {/* Informações da família */}
             <section className="rounded-[26px] border border-[#2c2925]/7 bg-white/45 p-6">
               <div className="mb-6">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6e4c12]">
@@ -646,10 +908,72 @@ Mariana & Henrique 🤍`;
                 />
               </div>
             </section>
+
+            {/* Modelo de mensagem */}
+            <section className="rounded-[26px] border border-[#2c2925]/7 bg-white/45 p-6">
+              <div className="mb-5">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6e4c12]">
+                  Personalização
+                </p>
+
+                <h2 className="mt-1 font-serif text-2xl tracking-[-0.03em] text-[#2c2925]">
+                  Mensagem do convite
+                </h2>
+
+                <p className="mt-2 text-xs leading-5 text-[#2c2925]/45">
+                  Personalize o texto enviado aos convidados pelo WhatsApp.
+                </p>
+              </div>
+
+              <textarea
+                value={inviteTemplate}
+                onChange={(event) => setInviteTemplate(event.target.value)}
+                rows={12}
+                className="w-full resize-y rounded-2xl border border-[#2c2925]/8 bg-white/70 p-3 text-xs leading-5 text-[#2c2925]/75 outline-none transition focus:border-[#6e4c12]/30"
+              />
+
+              <div className="mt-4">
+                <p className="mb-2 text-[9px] font-semibold uppercase tracking-widest text-[#2c2925]/40">
+                  Variáveis disponíveis
+                </p>
+
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    "{{familia}}",
+                    "{{nome}}",
+                    "{{codigo}}",
+                    "{{link}}",
+                  ].map((variable) => (
+                    <span
+                      key={variable}
+                      className="rounded-full bg-[#6e4c12]/8 px-2.5 py-1 font-mono text-[10px] text-[#6e4c12]"
+                    >
+                      {variable}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleSaveTemplate}
+                className="mt-5 inline-flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#2c2925] text-[10px] font-semibold uppercase tracking-widest text-white transition hover:bg-[#6e4c12]"
+              >
+                {templateSaved ? (
+                  <>
+                    <Check size={14} weight="bold" />
+                    Modelo salvo
+                  </>
+                ) : (
+                  "Salvar modelo"
+                )}
+              </button>
+            </section>
           </aside>
         </div>
       </div>
 
+      {/* Modal: adicionar convidado */}
       <AddGuestModal
         open={isAddGuestOpen}
         isLoading={addGuestMutation.isPending}
@@ -658,11 +982,15 @@ Mariana & Henrique 🤍`;
             setIsAddGuestOpen(false);
           }
         }}
-        onSubmit={(name) => {
-          addGuestMutation.mutate(name);
+        onSubmit={(name, phone) => {
+          addGuestMutation.mutate({
+            name,
+            phone,
+          });
         }}
       />
 
+      {/* Modal: editar família */}
       <EditFamilyModal
         open={isEditFamilyOpen}
         initialName={family.name}
@@ -677,6 +1005,7 @@ Mariana & Henrique 🤍`;
         }}
       />
 
+      {/* Modal: editar convidado */}
       <EditGuestModal
         open={Boolean(editingGuest)}
         guest={editingGuest}
@@ -686,17 +1015,19 @@ Mariana & Henrique 🤍`;
             setEditingGuest(null);
           }
         }}
-        onSubmit={(name, status) => {
+        onSubmit={(name, status, phone) => {
           if (!editingGuest) return;
 
           editGuestMutation.mutate({
             memberId: editingGuest.id,
             name,
             status,
+            phone,
           });
         }}
       />
 
+      {/* Modal: excluir convidado */}
       <ConfirmDeleteModal
         open={Boolean(deletingGuest)}
         title="Excluir convidado?"
@@ -714,12 +1045,11 @@ Mariana & Henrique 🤍`;
         onConfirm={() => {
           if (!deletingGuest) return;
 
-          deleteGuestMutation.mutate(
-            deletingGuest.id,
-          );
+          deleteGuestMutation.mutate(deletingGuest.id);
         }}
       />
 
+      {/* Modal: excluir família */}
       <ConfirmDeleteModal
         open={isDeleteFamilyOpen}
         title="Excluir família?"
@@ -739,68 +1069,5 @@ Mariana & Henrique 🤍`;
         }}
       />
     </AdminShell>
-  );
-}
-
-function SummaryCard({
-  label,
-  value,
-  icon,
-  accent = false,
-}: {
-  label: string;
-  value: number;
-  icon: ReactNode;
-  accent?: boolean;
-}) {
-  return (
-    <motion.div
-      whileHover={{ y: -2 }}
-      className="rounded-[22px] border border-[#2c2925]/7 bg-white/45 p-4 sm:p-5"
-    >
-      <div className="flex items-center justify-between">
-        <div
-          className={`flex h-8 w-8 items-center justify-center rounded-full ${
-            accent
-              ? "bg-[#6e4c12]/10 text-[#6e4c12]"
-              : "bg-[#2c2925]/5 text-[#2c2925]/40"
-          }`}
-        >
-          {icon}
-        </div>
-
-        <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#2c2925]/30">
-          RSVP
-        </span>
-      </div>
-
-      <p className="mt-5 font-serif text-3xl leading-none tracking-[-0.04em] text-[#2c2925]">
-        {value}
-      </p>
-
-      <p className="mt-1.5 text-[10px] font-medium uppercase tracking-[0.12em] text-[#2c2925]/35">
-        {label}
-      </p>
-    </motion.div>
-  );
-}
-
-function InfoRow({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="flex items-center justify-between gap-4 border-b border-[#2c2925]/6 pb-3 last:border-0 last:pb-0">
-      <span className="text-[10px] font-medium uppercase tracking-widest text-[#2c2925]/35">
-        {label}
-      </span>
-
-      <span className="text-right text-xs font-medium text-[#2c2925]/70">
-        {value}
-      </span>
-    </div>
   );
 }

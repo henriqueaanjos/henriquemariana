@@ -33,7 +33,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'fc706fc968fcc70d17cda9aba84f3c8e9a234208f5c974a0a8421327c13ab1fa'>;
+  StorageHashBase<'932c4cdd41086b47334934fb5a8e1180e6262e7bc95355ec80b4a1251de858d2'>;
 export type ExecutionHash =
   ExecutionHashBase<'135810afa82370f9b7186e627121579f11ed4b9ebf5eed28d50696e1b7b5f6a1'>;
 export type ProfileHash =
@@ -252,6 +252,7 @@ export type FieldOutputTypes = {
       readonly id: Char<36>;
       readonly familyId: Char<36>;
       readonly name: CodecTypes['pg/text@1']['output'];
+      readonly phone: CodecTypes['pg/text@1']['output'] | null;
       readonly status: 'PENDING' | 'CONFIRMED' | 'DECLINED';
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
@@ -300,6 +301,7 @@ export type FieldInputTypes = {
       readonly id: CodecTypes['sql/char@1']['input'];
       readonly familyId: CodecTypes['sql/char@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
+      readonly phone: CodecTypes['pg/text@1']['input'] | null;
       readonly status: 'PENDING' | 'CONFIRMED' | 'DECLINED';
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
@@ -349,6 +351,7 @@ export type StorageColumnTypes = {
       readonly familyId: Char<36>;
       readonly id: Char<36>;
       readonly name: CodecTypes['pg/text@1']['output'];
+      readonly phone: CodecTypes['pg/text@1']['output'] | null;
       readonly status: 'PENDING' | 'CONFIRMED' | 'DECLINED';
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
     };
@@ -397,6 +400,7 @@ export type StorageColumnInputTypes = {
       readonly familyId: CodecTypes['sql/char@1']['input'];
       readonly id: CodecTypes['sql/char@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
+      readonly phone: CodecTypes['pg/text@1']['input'] | null;
       readonly status: 'PENDING' | 'CONFIRMED' | 'DECLINED';
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
@@ -502,6 +506,11 @@ type ContractBase = Omit<
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
+                };
+                readonly phone: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
                 };
                 readonly status: {
                   readonly nativeType: 'text';
@@ -788,6 +797,10 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly phone: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly status: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -827,6 +840,7 @@ type ContractBase = Omit<
                 readonly id: { readonly column: 'id' };
                 readonly familyId: { readonly column: 'familyId' };
                 readonly name: { readonly column: 'name' };
+                readonly phone: { readonly column: 'phone' };
                 readonly status: { readonly column: 'status' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly updatedAt: { readonly column: 'updatedAt' };

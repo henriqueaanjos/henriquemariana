@@ -1,8 +1,8 @@
-import { getAlbums } from "@/src/services/staticPhotos";
 import { NextResponse } from "next/server";
+import { getAlbums } from "@/src/services/staticPhotos";
 
-export async function GET() {
-    const albums = getAlbums();
+export const runtime = "nodejs";
 
-    return NextResponse.json(albums);
+export function GET() {
+  return NextResponse.json(getAlbums());
 }

@@ -1,3 +1,4 @@
+
 import { db } from "@/src/prisma/db";
 import { requireAdminSession } from "@/src/services/admin-auth";
 import { Char } from "@prisma/orm-postgres/target/codec-types";
@@ -18,9 +19,12 @@ type RouteContext = {
   }>;
 };
 
-async function getMember(memberId: string, familyId: string) {
-  const member = await db.orm.public.FamilyMember.where((member) =>
-    member.id.eq(memberId as Char<36>)
+async function getMember(
+  memberId: string,
+  familyId: string,
+) {
+  const member = await db.orm.public.FamilyMember.where(
+    (member) => member.id.eq(memberId as Char<36>)
   ).first();
 
   if (!member || member.familyId !== familyId) {
@@ -44,7 +48,10 @@ export async function PATCH(
       );
     }
 
-    const { id: familyId, memberId } = await context.params;
+    const {
+      id: familyId,
+      memberId,
+    } = await context.params;
 
     if (!familyId || !memberId) {
       return NextResponse.json(
@@ -66,6 +73,7 @@ export async function PATCH(
 
     const data: {
       name?: string;
+      phone?: string | null;
       status?: RSVPStatus;
     } = {};
 
@@ -83,10 +91,30 @@ export async function PATCH(
       data.name = body.name.trim();
     }
 
+    if (body.phone !== undefined) {
+      if (
+        body.phone !== null &&
+        typeof body.phone !== "string"
+      ) {
+        return NextResponse.json(
+          { error: "Telefone inválido." },
+          { status: 400 },
+        );
+      }
+
+      data.phone =
+        typeof body.phone === "string" &&
+        body.phone.trim()
+          ? body.phone.trim()
+          : null;
+    }
+
     if (body.status !== undefined) {
       if (
         typeof body.status !== "string" ||
-        !VALID_STATUSES.includes(body.status as RSVPStatus)
+        !VALID_STATUSES.includes(
+          body.status as RSVPStatus,
+        )
       ) {
         return NextResponse.json(
           { error: "Status de RSVP inválido." },
@@ -105,10 +133,10 @@ export async function PATCH(
     }
 
     const updatedMember =
-      await db.orm.public.FamilyMember.where((member) =>
-        member.id.eq(memberId as Char<36>)
-      ).update(
-        data);
+      await db.orm.public.FamilyMember.where(
+        (member) =>
+          member.id.eq(memberId as Char<36>)
+      ).update(data);
 
     return NextResponse.json(updatedMember, {
       status: 200,
@@ -140,7 +168,10 @@ export async function DELETE(
       );
     }
 
-    const { id: familyId, memberId } = await context.params;
+    const {
+      id: familyId,
+      memberId,
+    } = await context.params;
 
     if (!familyId || !memberId) {
       return NextResponse.json(
@@ -158,8 +189,9 @@ export async function DELETE(
       );
     }
 
-    await db.orm.public.FamilyMember.where((member) =>
-      member.id.eq(memberId as Char<36>)
+    await db.orm.public.FamilyMember.where(
+      (member) =>
+        member.id.eq(memberId as Char<36>)
     ).delete();
 
     return NextResponse.json(

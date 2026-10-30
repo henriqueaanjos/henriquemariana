@@ -1,0 +1,208 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { Check, Clock, X, XCircle } from "@phosphor-icons/react";
+
+import type {
+  CerimonialGuest,
+  RSVPGuestStatus,
+} from "@/src/services/cerimonial";
+
+interface EditCerimonialGuestModalProps {
+  open: boolean;
+  guest: CerimonialGuest | null;
+  isLoading?: boolean;
+  onClose: () => void;
+  onSubmit: (status: RSVPGuestStatus) => void;
+}
+
+const statusOptions = [
+  {
+    value: "confirmed",
+    label: "Confirmado",
+    description: "Presença confirmada",
+    icon: <Check size={18} weight="bold" />,
+  },
+  {
+    value: "pending",
+    label: "Pendente",
+    description: "Ainda não respondeu",
+    icon: <Clock size={18} weight="bold" />,
+  },
+  {
+    value: "declined",
+    label: "Recusado",
+    description: "Não poderá comparecer",
+    icon: <XCircle size={18} weight="bold" />,
+  },
+] as const;
+
+export function EditCerimonialGuestModal({
+  open,
+  guest,
+  isLoading = false,
+  onClose,
+  onSubmit,
+}: EditCerimonialGuestModalProps) {
+  const [status, setStatus] = useState<RSVPGuestStatus>("pending");
+
+  useEffect(() => {
+    if (guest) {
+      setStatus(guest.status);
+    }
+  }, [guest]);
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (isLoading) return;
+
+    onSubmit(status);
+  }
+
+  return (
+    <AnimatePresence>
+      {open && guest && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={isLoading ? undefined : onClose}
+            className="fixed inset-0 z-50 bg-black/20 backdrop-blur-[3px]"
+          />
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 12 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="cerimonial-edit-title"
+              className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-black/6 bg-[#FCFBF8] shadow-2xl"
+            >
+              <div className="flex items-center justify-between border-b border-black/6 px-6 py-5">
+                <div>
+                  <h2
+                    id="cerimonial-edit-title"
+                    className="text-[17px] font-medium tracking-[-0.02em] text-[#292722]"
+                  >
+                    Atualizar confirmação
+                  </h2>
+
+                  <p className="mt-1 text-[13px] text-[#8A867D]">
+                    Altere o status de presença do convidado.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={onClose}
+                  disabled={isLoading}
+                  aria-label="Fechar"
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-[#8A867D] transition hover:bg-black/4 hover:text-[#292722] disabled:opacity-50"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-6 p-6">
+                <div className="rounded-xl border border-black/6 bg-white px-4 py-3">
+                  <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#8A867D]">
+                    Convidado
+                  </p>
+
+                  <p className="mt-1 text-sm font-medium text-[#292722]">
+                    {guest.name}
+                  </p>
+
+                  <p className="mt-1 text-xs text-[#9A968D]">
+                    Família: {guest.familyName}
+                  </p>
+                </div>
+
+                <div>
+                  <label className="mb-3 block text-[12px] font-medium uppercase tracking-[0.08em] text-[#8A867D]">
+                    Status do RSVP
+                  </label>
+
+                  <div className="space-y-2">
+                    {statusOptions.map((option) => {
+                      const selected = status === option.value;
+
+                      return (
+                        <button
+                          key={option.value}
+                          type="button"
+                          disabled={isLoading}
+                          onClick={() => setStatus(option.value)}
+                          className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition ${
+                            selected
+                              ? "border-[#9B8055]/40 bg-[#9B8055]/[0.07]"
+                              : "border-black/6 bg-white hover:border-black/12"
+                          } disabled:opacity-60`}
+                        >
+                          <span
+                            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
+                              selected
+                                ? "bg-[#9B8055]/10 text-[#80663E]"
+                                : "bg-black/[0.035] text-[#8A867D]"
+                            }`}
+                          >
+                            {option.icon}
+                          </span>
+
+                          <span className="min-w-0 flex-1">
+                            <span className="block text-[13px] font-medium text-[#292722]">
+                              {option.label}
+                            </span>
+
+                            <span className="mt-0.5 block text-[12px] text-[#9A968D]">
+                              {option.description}
+                            </span>
+                          </span>
+
+                          {selected && (
+                            <Check
+                              size={17}
+                              weight="bold"
+                              className="text-[#80663E]"
+                            />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    disabled={isLoading}
+                    className="h-10 rounded-xl px-4 text-[13px] font-medium text-[#77736B] transition hover:bg-black/4 disabled:opacity-50"
+                  >
+                    Cancelar
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="h-10 rounded-xl bg-[#292722] px-5 text-[13px] font-medium text-white transition hover:bg-[#1E1D1A] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {isLoading ? "Salvando..." : "Salvar alterações"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}

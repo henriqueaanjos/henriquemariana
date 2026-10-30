@@ -81,6 +81,8 @@ export const contract = defineContract({}, ({ field, model, rel }) => {
             familyId: field.uuidString(),
             name: field.text(),
 
+            phone: field.text().optional(),
+
             status: field.namedType(RSVPStatus).default(
                 RSVPStatus.members.PENDING,
             ),

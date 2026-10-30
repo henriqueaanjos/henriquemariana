@@ -9,6 +9,7 @@ export interface AdminRSVPFamilyGuest {
     id: string;
     familyId: string;
     name: string;
+    phone?: string | null;
     status: RSVPGuestStatus;
     createdAt: string;
     updatedAt: string;
@@ -27,6 +28,7 @@ interface ApiFamilyMember {
     id: string;
     familyId: string;
     name: string;
+    phone?: string | null;
     status: "PENDING" | "CONFIRMED" | "DECLINED";
     createdAt: string;
     updatedAt: string;
@@ -75,6 +77,7 @@ export async function getAdminRSVPFamily(
             id: member.id,
             familyId: member.familyId,
             name: member.name,
+            phone: member.phone ?? null,
             status: normalizeStatus(member.status),
             createdAt: member.createdAt,
             updatedAt: member.updatedAt,
@@ -83,17 +86,19 @@ export async function getAdminRSVPFamily(
 }
 
 export async function createAdminRSVPFamilyMember(
-    familyId: string,
-    name: string,
+  familyId: string,
+  name: string,
+  phone?: string,
 ) {
-    const { data } = await axios.post(
-        `/api/admin/families/${familyId}/members`,
-        {
-            name,
-        },
-    );
+  const { data } = await axios.post(
+    `/api/admin/families/${familyId}/members`,
+    {
+      name,
+      phone: phone || null,
+    },
+  );
 
-    return data;
+  return data;
 }
 
 export async function updateAdminRSVPFamily(
@@ -111,8 +116,9 @@ export async function updateAdminRSVPFamily(
 }
 
 export type UpdateAdminRSVPFamilyMemberPayload = {
-    name?: string;
-    status?: RSVPGuestStatus;
+  name?: string;
+  phone?: string | null;
+  status?: RSVPGuestStatus;
 };
 
 function toApiStatus(

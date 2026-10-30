@@ -1,30 +1,34 @@
-import { NextRequest, NextResponse } from "next/server";
-import { SESSION_COOKIE, verifyAdminSession } from "./services/admin-auth";
 
+import { NextRequest, NextResponse } from "next/server";
+import {
+  SESSION_COOKIE,
+  getSessionRole,
+} from "./services/admin-auth";
 
 export function proxy(request: NextRequest) {
-    const { pathname } = request.nextUrl;
+  const { pathname } = request.nextUrl;
 
-    if (!pathname.startsWith("/admin")) {
-        return NextResponse.next();
-    }
+  const isAdminRoute = pathname.startsWith("/admin");
+  const isCerimonialRoute = pathname.startsWith("/cerimonial");
 
-    const session = request.cookies.get(
-        SESSION_COOKIE
-    )?.value;
-
-    if (!verifyAdminSession(session)) {
-        const loginUrl = new URL(
-            "/login",
-            request.url
-        );
-
-        return NextResponse.redirect(loginUrl);
-    }
-
+  if (!isAdminRoute && !isCerimonialRoute) {
     return NextResponse.next();
+  }
+
+  const token = request.cookies.get(SESSION_COOKIE)?.value;
+  const role = getSessionRole(token);
+
+  if (isAdminRoute && role !== "admin") {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  if (isCerimonialRoute && role !== "cerimonial") {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {
-    matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/cerimonial/:path*"],
 };

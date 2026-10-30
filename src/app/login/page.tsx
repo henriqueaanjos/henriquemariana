@@ -23,6 +23,11 @@ interface AdminLoginError {
   error: string;
 }
 
+interface AdminLoginResponse {
+  success: boolean;
+  role: "admin" | "cerimonial";
+}
+
 export default function LoginPage() {
   const router = useRouter();
 
@@ -38,16 +43,21 @@ export default function LoginPage() {
   });
 
   const loginMutation = useMutation<
-    unknown,
+    AdminLoginResponse,
     AxiosError<AdminLoginError>,
     string
   >({
     mutationFn: adminLogin,
 
-    onSuccess: () => {
-      router.replace("/admin");
+
+    onSuccess: (data) => {
+      router.replace(
+        data.role === "admin" ? "/admin" : "/cerimonial",
+      );
+
       router.refresh();
     },
+
   });
 
   function onSubmit(data: AdminLoginInput) {

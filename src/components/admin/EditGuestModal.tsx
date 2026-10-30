@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -22,6 +23,7 @@ interface EditGuestModalProps {
   onSubmit: (
     name: string,
     status: RSVPGuestStatus,
+    phone: string,
   ) => void;
 }
 
@@ -51,6 +53,20 @@ const statusOptions: {
   },
 ];
 
+function formatPhone(value: string) {
+  const numbers = value.replace(/\D/g, "").slice(0, 11);
+
+  if (numbers.length <= 2) {
+    return numbers.length ? `(${numbers}` : "";
+  }
+
+  if (numbers.length <= 7) {
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+  }
+
+  return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7)}`;
+}
+
 export function EditGuestModal({
   open,
   guest,
@@ -59,6 +75,7 @@ export function EditGuestModal({
   onSubmit,
 }: EditGuestModalProps) {
   const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [status, setStatus] =
     useState<RSVPGuestStatus>("pending");
 
@@ -66,17 +83,22 @@ export function EditGuestModal({
     if (!guest) return;
 
     setName(guest.name);
+    setPhone(formatPhone(guest.phone ?? ""));
     setStatus(guest.status);
   }, [guest]);
 
-  function handleSubmit(event: React.FormEvent) {
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const normalizedName = name.trim();
 
-    if (!normalizedName) return;
+    if (!normalizedName || isLoading) return;
 
-    onSubmit(normalizedName, status);
+    onSubmit(
+      normalizedName,
+      status,
+      phone.replace(/\D/g, ""),
+    );
   }
 
   return (
@@ -92,21 +114,9 @@ export function EditGuestModal({
           />
 
           <motion.div
-            initial={{
-              opacity: 0,
-              scale: 0.96,
-              y: 12,
-            }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-              y: 0,
-            }}
-            exit={{
-              opacity: 0,
-              scale: 0.96,
-              y: 12,
-            }}
+            initial={{ opacity: 0, scale: 0.96, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 12 }}
             transition={{
               duration: 0.2,
               ease: "easeOut",
@@ -116,7 +126,7 @@ export function EditGuestModal({
             <div
               role="dialog"
               aria-modal="true"
-              className="w-full max-w-md overflow-hidden rounded-2xl border border-black/6 bg-[#FCFBF8] shadow-2xl"
+              className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-black/6 bg-[#FCFBF8] shadow-2xl"
             >
               <div className="flex items-center justify-between border-b border-black/6 px-6 py-5">
                 <div>
@@ -133,6 +143,7 @@ export function EditGuestModal({
                   type="button"
                   onClick={onClose}
                   disabled={isLoading}
+                  aria-label="Fechar"
                   className="flex h-8 w-8 items-center justify-center rounded-full text-[#8A867D] transition hover:bg-black/4 hover:text-[#292722] disabled:opacity-50"
                 >
                   <X size={18} />
@@ -162,6 +173,36 @@ export function EditGuestModal({
                     className="h-11 w-full rounded-xl border border-black/8 bg-white px-4 text-[14px] text-[#292722] outline-none transition placeholder:text-[#B0ACA3] focus:border-[#9B8055]/50 focus:ring-2 focus:ring-[#9B8055]/10 disabled:opacity-60"
                     placeholder="Nome do convidado"
                   />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="edit-guest-phone"
+                    className="mb-2 block text-[12px] font-medium uppercase tracking-[0.08em] text-[#8A867D]"
+                  >
+                    WhatsApp
+                    <span className="ml-1 font-normal normal-case tracking-normal text-[#A6A197]">
+                      (opcional)
+                    </span>
+                  </label>
+
+                  <input
+                    id="edit-guest-phone"
+                    type="tel"
+                    inputMode="numeric"
+                    autoComplete="tel-national"
+                    value={phone}
+                    onChange={(event) =>
+                      setPhone(formatPhone(event.target.value))
+                    }
+                    placeholder="(67) 99999-9999"
+                    disabled={isLoading}
+                    className="h-11 w-full rounded-xl border border-black/8 bg-white px-4 text-[14px] text-[#292722] outline-none transition placeholder:text-[#B0ACA3] focus:border-[#9B8055]/50 focus:ring-2 focus:ring-[#9B8055]/10 disabled:opacity-60"
+                  />
+
+                  <p className="mt-2 text-[11px] text-[#9A968D]">
+                    Deixe vazio caso não tenha o contato.
+                  </p>
                 </div>
 
                 <div>
@@ -233,9 +274,7 @@ export function EditGuestModal({
 
                   <button
                     type="submit"
-                    disabled={
-                      isLoading || !name.trim()
-                    }
+                    disabled={isLoading || !name.trim()}
                     className="h-10 rounded-xl bg-[#292722] px-5 text-[13px] font-medium text-white transition hover:bg-[#1E1D1A] disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {isLoading
