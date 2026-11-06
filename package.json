@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-   "build": "node scripts/generate-static-photos.mjs && next build",
+    "build": "node scripts/generate-static-photos.mjs && next build",
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma skills sync || exit 0",
@@ -20,6 +20,8 @@
     "@vercel/blob": "^2.8.0",
     "axios": "^1.20.0",
     "dotenv": "^17.4.2",
+    "html5-qrcode": "^2.3.8",
+    "jspdf": "^4.2.1",
     "motion": "^13.1.0",
     "next": "16.3.1",
     "qrcode.react": "^4.2.0",

@@ -86,6 +86,7 @@ export const contract = defineContract({}, ({ field, model, rel }) => {
             status: field.namedType(RSVPStatus).default(
                 RSVPStatus.members.PENDING,
             ),
+            checkedInAt: field.temporal.createdAtString().optional(),
 
             createdAt: field.temporal.createdAtString(),
             updatedAt: field.temporal.updatedAtString(),

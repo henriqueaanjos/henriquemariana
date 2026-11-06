@@ -130,6 +130,13 @@
           },
           "FamilyMember": {
             "fields": {
+              "checkedInAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
               "createdAt": {
                 "nullable": false,
                 "type": {
@@ -211,6 +218,9 @@
             },
             "storage": {
               "fields": {
+                "checkedInAt": {
+                  "column": "checkedInAt"
+                },
                 "createdAt": {
                   "column": "createdAt"
                 },
@@ -577,6 +587,15 @@
                 }
               ],
               "columns": {
+                "checkedInAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
                 "createdAt": {
                   "codecId": "pg/timestamptz-string@1",
                   "default": {
@@ -840,7 +859,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "932c4cdd41086b47334934fb5a8e1180e6262e7bc95355ec80b4a1251de858d2"
+    "storageHash": "7fdb29cf29f84fcda7c6ec5c55ae75b844c6bfae1de6e5f5d16ccb5553ac5f48"
   },
   "execution": {
     "executionHash": "135810afa82370f9b7186e627121579f11ed4b9ebf5eed28d50696e1b7b5f6a1",

@@ -1,17 +1,14 @@
-
 import { NextRequest, NextResponse } from "next/server";
-import {
-  SESSION_COOKIE,
-  getSessionRole,
-} from "./services/admin-auth";
+import { SESSION_COOKIE, getSessionRole } from "./services/admin-auth";
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isAdminRoute = pathname.startsWith("/admin");
   const isCerimonialRoute = pathname.startsWith("/cerimonial");
+  const isValidatorRoute = pathname.startsWith("/validator");
 
-  if (!isAdminRoute && !isCerimonialRoute) {
+  if (!isAdminRoute && !isCerimonialRoute && !isValidatorRoute) {
     return NextResponse.next();
   }
 
@@ -26,9 +23,21 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
+  if (
+    isValidatorRoute &&
+    role !== "admin" &&
+    role !== "cerimonial"
+  ) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/cerimonial/:path*"],
+  matcher: [
+    "/admin/:path*",
+    "/cerimonial/:path*",
+    "/validator/:path*",
+  ],
 };

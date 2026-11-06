@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { jsPDF } from "jspdf";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   ArrowLeft,
@@ -175,6 +176,106 @@ function MemberResponse({
   );
 }
 
+async function svgToPng(
+  svg: SVGSVGElement,
+  outputSize = 1200,
+): Promise<string> {
+  const clonedSvg = svg.cloneNode(true) as SVGSVGElement;
+
+  clonedSvg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+  clonedSvg.setAttribute("width", String(outputSize));
+  clonedSvg.setAttribute("height", String(outputSize));
+
+  const svgString = new XMLSerializer().serializeToString(clonedSvg);
+
+  const blob = new Blob([svgString], {
+    type: "image/svg+xml;charset=utf-8",
+  });
+
+  const url = URL.createObjectURL(blob);
+
+  try {
+    const image = new Image();
+
+    await new Promise<void>((resolve, reject) => {
+      image.onload = () => resolve();
+      image.onerror = () => reject(new Error("Erro ao carregar SVG."));
+      image.src = url;
+    });
+
+    const canvas = document.createElement("canvas");
+    canvas.width = outputSize;
+    canvas.height = outputSize;
+
+    const context = canvas.getContext("2d");
+
+    if (!context) {
+      throw new Error("Não foi possível criar o canvas.");
+    }
+
+    context.fillStyle = "#FFFFFF";
+    context.fillRect(0, 0, outputSize, outputSize);
+    context.drawImage(image, 0, 0, outputSize, outputSize);
+
+    return canvas.toDataURL("image/png");
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+async function loadMonogram(): Promise<{
+  data: string;
+  width: number;
+  height: number;
+}> {
+  const response = await fetch("/monograma_2.svg");
+
+  if (!response.ok) {
+    throw new Error("Não foi possível carregar o monograma.");
+  }
+
+  const svgText = await response.text();
+
+  const blob = new Blob([svgText], {
+    type: "image/svg+xml;charset=utf-8",
+  });
+
+  const url = URL.createObjectURL(blob);
+
+  try {
+    const image = new Image();
+
+    await new Promise<void>((resolve, reject) => {
+      image.onload = () => resolve();
+      image.onerror = () => reject(
+        new Error("Erro ao carregar o monograma."),
+      );
+      image.src = url;
+    });
+
+    const canvas = document.createElement("canvas");
+    canvas.width = image.naturalWidth || 500;
+    canvas.height = image.naturalHeight || 500;
+
+    const context = canvas.getContext("2d");
+
+    if (!context) {
+      throw new Error("Não foi possível processar o monograma.");
+    }
+
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+    return {
+      data: canvas.toDataURL("image/png"),
+      width: canvas.width,
+      height: canvas.height,
+    };
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+
 function RSVPSuccess({
   family,
   onBack,
@@ -182,6 +283,174 @@ function RSVPSuccess({
   family: RSVPFamily;
   onBack: () => void;
 }) {
+  const qrRef = useRef<SVGSVGElement>(null);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+
+  async function handleDownloadPDF() {
+    if (!qrRef.current || isGeneratingPDF) return;
+
+    setIsGeneratingPDF(true);
+
+    try {
+      const [qrImage, monogram] = await Promise.all([
+        svgToPng(qrRef.current, 1200),
+        loadMonogram(),
+      ]);
+
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      const pageWidth = 210;
+      const pageHeight = 297;
+
+      const primaryLight = [255, 246, 230] as const;
+      const primary = [217, 185, 130] as const;
+      const primaryDark = [110, 76, 18] as const;
+
+      // Fundo
+      pdf.setFillColor(...primaryLight);
+      pdf.rect(0, 0, pageWidth, pageHeight, "F");
+
+      // Moldura externa
+      pdf.setDrawColor(...primary);
+      pdf.setLineWidth(0.5);
+      pdf.roundedRect(12, 12, 186, 273, 3, 3, "S");
+
+      // Moldura interna
+      pdf.setDrawColor(...primary);
+      pdf.setLineWidth(0.2);
+      pdf.roundedRect(15, 15, 180, 267, 2, 2, "S");
+
+      // Monograma
+      const monogramMaxWidth = 30;
+      const monogramMaxHeight = 30;
+
+      const aspectRatio = monogram.width / monogram.height;
+
+      let monogramWidth = monogramMaxWidth;
+      let monogramHeight = monogramWidth / aspectRatio;
+
+      if (monogramHeight > monogramMaxHeight) {
+        monogramHeight = monogramMaxHeight;
+        monogramWidth = monogramHeight * aspectRatio;
+      }
+
+      pdf.addImage(
+        monogram.data,
+        "PNG",
+        (pageWidth - monogramWidth) / 2,
+        27,
+        monogramWidth,
+        monogramHeight,
+      );
+
+      // Nomes do casal
+      pdf.setTextColor(...primaryDark);
+      pdf.setFont("times", "normal");
+      pdf.setFontSize(25);
+      pdf.text("Mariana & Henrique", pageWidth / 2, 76, {
+        align: "center",
+      });
+
+      // Data
+      pdf.setFontSize(10);
+      // pdf.setCharSpace(2);
+      pdf.text("09 · 01 · 2027", pageWidth / 2, 85, {
+        align: "center",
+      });
+      pdf.setCharSpace(0);
+
+      // Linha decorativa
+      pdf.setDrawColor(...primary);
+      pdf.setLineWidth(0.5);
+      pdf.line(65, 96, 145, 96);
+
+      // Título
+      pdf.setFont("times", "normal");
+      pdf.setFontSize(20);
+      pdf.text("Confirmação de Presença", pageWidth / 2, 112, {
+        align: "center",
+      });
+
+      // Família
+      pdf.setFontSize(13);
+      pdf.text(`Família ${family.name}`, pageWidth / 2, 124, {
+        align: "center",
+      });
+
+      // QR Code
+      const qrSize = 68;
+      const qrX = (pageWidth - qrSize) / 2;
+      const qrY = 137;
+
+      pdf.setFillColor(255, 255, 255);
+      pdf.roundedRect(
+        qrX - 5,
+        qrY - 5,
+        qrSize + 10,
+        qrSize + 10,
+        3,
+        3,
+        "F",
+      );
+
+      pdf.addImage(qrImage, "PNG", qrX, qrY, qrSize, qrSize);
+
+      // Código de confirmação
+      pdf.setFont("times", "bold");
+      pdf.setFontSize(10);
+      pdf.text("CÓDIGO DE CONFIRMAÇÃO", pageWidth / 2, 224, {
+        align: "center",
+      });
+
+      pdf.setFont("times", "normal");
+      pdf.setFontSize(19);
+      pdf.text(family.code, pageWidth / 2, 237, {
+        align: "center",
+      });
+
+      // Orientação
+      pdf.setFontSize(10);
+      pdf.text(
+        "Apresente este código na entrada do evento.",
+        pageWidth / 2,
+        253,
+        { align: "center" },
+      );
+
+      // Rodapé
+      pdf.setDrawColor(...primary);
+      pdf.line(65, 263, 145, 263);
+
+      pdf.setFontSize(9);
+      pdf.setTextColor(...primaryDark);
+      pdf.text(
+        "Será uma alegria celebrar esse momento com vocês!",
+        pageWidth / 2,
+        273,
+        { align: "center" },
+      );
+
+      const safeFamilyName = family.name
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
+
+      pdf.save(`Convite-${safeFamilyName || family.code}.pdf`);
+    } catch (error) {
+      console.error("Erro ao gerar PDF:", error);
+      window.alert(
+        "Não foi possível gerar seu PDF. Tente novamente.",
+      );
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  }
+
   return (
     <motion.div
       key="success"
@@ -225,6 +494,7 @@ function RSVPSuccess({
       <div className="flex max-w-full flex-col items-center gap-3 sm:gap-4">
         <div className="rounded-2xl bg-white p-3 shadow-xl sm:rounded-3xl sm:p-6">
           <QRCodeSVG
+            ref={qrRef}
             value={`${window.location.origin}/rsvp/${family.code}`}
             size={220}
             level="H"
@@ -245,26 +515,19 @@ function RSVPSuccess({
         <LiquidGlassWrapper className="w-full rounded-lg bg-primary-dark/70">
           <button
             type="button"
-            className="flex h-11 w-full items-center justify-center gap-2 px-3 font-lora text-xs uppercase text-background transition-opacity hover:opacity-80"
+            onClick={handleDownloadPDF}
+            disabled={isGeneratingPDF}
+            className="flex h-11 w-full items-center justify-center gap-2 px-3 font-lora text-xs uppercase text-background transition-opacity hover:opacity-80 disabled:cursor-wait disabled:opacity-50"
           >
             <FilePdf size={17} weight="regular" />
-            Salvar PDF
-          </button>
-        </LiquidGlassWrapper>
-
-        <LiquidGlassWrapper className="w-full rounded-lg bg-background/10">
-          <button
-            type="button"
-            className="flex h-11 w-full items-center justify-center gap-2 px-3 font-lora text-xs uppercase text-background transition-opacity hover:opacity-80"
-          >
-            <Wallet size={17} weight="regular" />
-            Salvar na Wallet
+            {isGeneratingPDF ? "Gerando PDF..." : "Salvar PDF"}
           </button>
         </LiquidGlassWrapper>
       </div>
     </motion.div>
   );
 }
+
 
 const slideVariants = {
   enter: (direction: 1 | -1) => ({
