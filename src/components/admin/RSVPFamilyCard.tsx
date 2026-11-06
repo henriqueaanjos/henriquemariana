@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -6,6 +7,7 @@ import {
   Copy,
   DotsThree,
   UsersThree,
+  Clock,
 } from "@phosphor-icons/react";
 import { motion } from "motion/react";
 
@@ -18,6 +20,7 @@ export interface RSVPGuest {
   id: string;
   name: string;
   status: RSVPGuestStatus;
+  checkedInAt: string | null;
 }
 
 export interface RSVPFamily {
@@ -48,7 +51,28 @@ const statusConfig = {
     className: "text-[#9a625c]",
     dotClassName: "bg-[#9a625c]",
   },
+  checkedIn: {
+    label: "Entrada registrada",
+    className: "text-[#477b75]",
+    dotClassName: "bg-[#477b75]",
+  },
 };
+
+function formatCheckInDate(date: string) {
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "Data indisponível";
+  }
+
+  return parsedDate.toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
 
 export function RSVPFamilyCard({
   family,
@@ -58,14 +82,19 @@ export function RSVPFamilyCard({
     (guest) => guest.status === "confirmed",
   ).length;
 
+  const checkedIn = family.guests.filter(
+    (guest) =>
+      guest.status === "confirmed" && Boolean(guest.checkedInAt),
+  ).length;
+
   const total = family.guests.length;
 
   const familyStatus =
-    confirmed === total
+    total > 0 && confirmed === total
       ? "confirmed"
       : confirmed > 0
         ? "pending"
-        : family.guests.every(
+        : total > 0 && family.guests.every(
               (guest) => guest.status === "declined",
             )
           ? "declined"
@@ -91,7 +120,7 @@ export function RSVPFamilyCard({
         duration: 0.35,
         ease: [0.22, 1, 0.36, 1],
       }}
-      className="group rounded-[22px] border border-[#2c2925]/7 bg-white/45 p-5 transition-shadow duration-300 hover:shadow-[0_18px_45px_rgba(44,41,37,0.06)] sm:p-6 cursor-pointer"
+      className="group cursor-pointer rounded-[22px] border border-[#2c2925]/7 bg-white/45 p-5 transition-shadow duration-300 hover:shadow-[0_18px_45px_rgba(44,41,37,0.06)] sm:p-6"
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
@@ -124,7 +153,7 @@ export function RSVPFamilyCard({
             </span>
           </div>
 
-          <div className="mt-1 flex items-center gap-2 text-[10px] text-[#2c2925]/40">
+          <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px] text-[#2c2925]/40">
             <UsersThree size={13} />
 
             <span>
@@ -133,9 +162,16 @@ export function RSVPFamilyCard({
 
             <span className="text-[#2c2925]/15">·</span>
 
-            <span>
-              {confirmed} confirmados
-            </span>
+            <span>{confirmed} confirmados</span>
+
+            {checkedIn > 0 && (
+              <>
+                <span className="text-[#2c2925]/15">·</span>
+                <span className="text-[#477b75]">
+                  {checkedIn} entradas registradas
+                </span>
+              </>
+            )}
           </div>
         </div>
 
@@ -151,7 +187,10 @@ export function RSVPFamilyCard({
       {/* Guests */}
       <div className="mt-5 divide-y divide-[#2c2925]/6 rounded-xl bg-[#2c2925]/2.5 px-3">
         {family.guests.map((guest) => {
-          const guestStatus = statusConfig[guest.status];
+          const guestStatus =
+            guest.status === "confirmed" && guest.checkedInAt
+              ? statusConfig.checkedIn
+              : statusConfig[guest.status];
 
           return (
             <div
@@ -167,9 +206,19 @@ export function RSVPFamilyCard({
                     .join("")}
                 </span>
 
-                <span className="truncate text-[11px] font-medium text-[#2c2925]/75">
-                  {guest.name}
-                </span>
+                <div className="flex min-w-0 flex-col">
+                  <span className="truncate text-[11px] font-medium text-[#2c2925]/75">
+                    {guest.name}
+                  </span>
+
+                  {guest.status === "confirmed" &&
+                    guest.checkedInAt && (
+                      <span className="mt-1 flex items-center gap-1 text-[9px] text-[#477b75]/75">
+                        <Clock size={10} />
+                        {formatCheckInDate(guest.checkedInAt)}
+                      </span>
+                    )}
+                </div>
               </div>
 
               <span
@@ -193,9 +242,7 @@ export function RSVPFamilyCard({
           onClick={handleCopyCode}
           className="group/code flex items-center gap-2 text-[9px] uppercase tracking-[0.12em] text-[#2c2925]/35 transition-colors hover:text-[#6e4c12]"
         >
-          <span>
-            Código {family.code}
-          </span>
+          <span>Código {family.code}</span>
 
           <Copy
             size={12}

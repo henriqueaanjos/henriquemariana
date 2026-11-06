@@ -652,8 +652,36 @@
                   "nullable": false
                 }
               },
-              "foreignKeys": [],
-              "indexes": [],
+              "foreignKeys": [
+                {
+                  "name": "FamilyMember_familyId_fkey",
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "familyId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "FamilyMember"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "Family"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "familyId"
+                  ],
+                  "name": "FamilyMember_familyId_idx_3d03045e",
+                  "prefix": "FamilyMember_familyId_idx",
+                  "unique": false
+                }
+              ],
               "primaryKey": {
                 "columns": [
                   "id"
@@ -859,7 +887,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "7fdb29cf29f84fcda7c6ec5c55ae75b844c6bfae1de6e5f5d16ccb5553ac5f48"
+    "storageHash": "6dc27314663f8c2af081974357b7359efc7df53878f15383a879fa97501e4acd"
   },
   "execution": {
     "executionHash": "135810afa82370f9b7186e627121579f11ed4b9ebf5eed28d50696e1b7b5f6a1",

@@ -1,14 +1,13 @@
+
 import axios from "axios";
 
-export type RSVPGuestStatus =
-  | "confirmed"
-  | "pending"
-  | "declined";
+export type RSVPGuestStatus = "confirmed" | "pending" | "declined";
 
 export interface AdminRSVPGuest {
   id: string;
   name: string;
   status: RSVPGuestStatus;
+  checkedInAt: string | null;
 }
 
 export interface AdminRSVPFamily {
@@ -31,6 +30,7 @@ interface ApiFamilyMember {
   familyId: string;
   name: string;
   status: "PENDING" | "CONFIRMED" | "DECLINED";
+  checkedInAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -41,11 +41,8 @@ function normalizeStatus(
   switch (status) {
     case "CONFIRMED":
       return "confirmed";
-
     case "DECLINED":
       return "declined";
-
-    case "PENDING":
     default:
       return "pending";
   }
@@ -62,6 +59,7 @@ async function getFamilyMembers(
     id: member.id,
     name: member.name,
     status: normalizeStatus(member.status),
+    checkedInAt: member.checkedInAt ?? null,
   }));
 }
 

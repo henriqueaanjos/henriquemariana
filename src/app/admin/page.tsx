@@ -129,6 +129,12 @@ export default function AdminPage() {
   } = useQuery<AdminDashboardData>({
     queryKey: ["admin-dashboard"],
     queryFn: getAdminDashboard,
+
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    refetchInterval: 30_000,
   });
 
   function formatRelativeDate(date: string) {
@@ -193,24 +199,33 @@ export default function AdminPage() {
 
 
   const activities = [
-    ...messages.slice(0, 2).map((message) => ({
+    ...messages.slice(0, 5).map((message) => ({
+      createdAt: message.createdAt,
       time: formatRelativeDate(message.createdAt),
       title: "Novo recado recebido",
       description: message.message,
     })),
 
-    ...photos.slice(0, 1).map((photo) => ({
+    ...photos.slice(0, 5).map((photo) => ({
+      createdAt: photo.createdAt,
       time: formatRelativeDate(photo.createdAt),
       title: "Nova foto adicionada",
       description: `${photo.userName} adicionou uma nova foto`,
     })),
 
-    ...playlist.slice(0, 1).map((song) => ({
+    ...playlist.slice(0, 5).map((song) => ({
+      createdAt: song.createdAt,
       time: formatRelativeDate(song.createdAt),
       title: "Nova música na playlist",
       description: `${song.title} · ${song.artist}`,
     })),
-  ];
+  ]
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() -
+        new Date(a.createdAt).getTime(),
+    )
+    .slice(0, 4);
 
   const weddingDate = new Date("2027-01-09T00:00:00");
 

@@ -6,8 +6,11 @@ import {
   MagnifyingGlass,
   Plus,
   UsersThree,
+  FilePdfIcon,
   X,
 } from "@phosphor-icons/react";
+
+import jsPDF from "jspdf";
 import { motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -77,11 +80,10 @@ function RSVPStat({
 }) {
   return (
     <div
-      className={`rounded-[22px] border p-5 ${
-        highlight
-          ? "border-[#d9b982]/25 bg-[#d9b982]/10"
-          : "border-[#2c2925]/7 bg-white/60"
-      }`}
+      className={`rounded-[22px] border p-5 ${highlight
+        ? "border-[#d9b982]/25 bg-[#d9b982]/10"
+        : "border-[#2c2925]/7 bg-white/60"
+        }`}
     >
       <div className="mb-5 flex items-center justify-between">
         <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#2c2925]/35">
@@ -100,9 +102,8 @@ function RSVPStat({
       </div>
 
       <p
-        className={`font-serif text-3xl tracking-[-0.04em] ${
-          highlight ? "text-[#2c2925]" : "text-[#2c2925]"
-        }`}
+        className={`font-serif text-3xl tracking-[-0.04em] ${highlight ? "text-[#2c2925]" : "text-[#2c2925]"
+          }`}
       >
         {value}
       </p>
@@ -196,6 +197,164 @@ export default function RSVPPage() {
     0,
   );
 
+  const checkedInGuests = families.reduce(
+    (total, family) =>
+      total +
+      family.guests.filter(
+        (guest) =>
+          guest.status === "confirmed" && Boolean(guest.checkedInAt),
+      ).length,
+    0,
+  );
+
+  const handleExportPDF = () => {
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+    });
+
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+
+    const margin = 15;
+    const contentWidth = pageWidth - margin * 2;
+
+    let y = 20;
+
+    const formatStatus = (guest: AdminRSVPFamily["guests"][number]) => {
+      if (guest.status === "declined") {
+        return "Nao confirmado";
+      }
+
+      if (guest.status === "pending") {
+        return "Pendente";
+      }
+
+      if (guest.checkedInAt) {
+        return "Entrada registrada";
+      }
+
+      return "Confirmado";
+    };
+
+    const formatCheckInDate = (date: string) =>
+      new Date(date).toLocaleString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+    const checkPageBreak = (requiredSpace = 10) => {
+      if (y + requiredSpace > pageHeight - margin) {
+        pdf.addPage();
+        y = 20;
+      }
+    };
+
+    // Cabeçalho
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(18);
+    pdf.text("Relatorio de convidados", margin, y);
+
+    y += 8;
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(9);
+    pdf.setTextColor(120);
+
+    pdf.text(
+      `Mariana & Henrique | Gerado em ${new Date().toLocaleString("pt-BR")}`,
+      margin,
+      y,
+    );
+
+    y += 12;
+
+    // Resumo
+    pdf.setTextColor(44, 41, 37);
+    pdf.setFontSize(10);
+
+    pdf.text(`Familias: ${families.length}`, margin, y);
+    pdf.text(`Convidados: ${totalGuests}`, margin + 45, y);
+    pdf.text(`Confirmados: ${confirmedGuests}`, margin + 90, y);
+
+    y += 6;
+
+    pdf.text(`Entradas registradas: ${checkedInGuests}`, margin, y);
+
+    y += 12;
+
+    // Famílias e convidados
+    families.forEach((family) => {
+      checkPageBreak(18);
+
+      pdf.setFillColor(245, 242, 236);
+      pdf.roundedRect(margin, y - 5, contentWidth, 9, 1.5, 1.5, "F");
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(10);
+      pdf.setTextColor(44, 41, 37);
+
+      const familyLabel =
+        family.guests.length === 1
+          ? family.name
+          : `Familia ${family.name}`;
+
+      pdf.text(familyLabel, margin + 3, y + 1);
+
+      y += 10;
+
+      family.guests.forEach((guest) => {
+        const status = formatStatus(guest);
+
+        const checkInDate = guest.checkedInAt
+          ? ` | ${formatCheckInDate(guest.checkedInAt)}`
+          : "";
+
+        const guestLines = pdf.splitTextToSize(
+          `${guest.name} - ${status}${checkInDate}`,
+          contentWidth - 8,
+        );
+
+        checkPageBreak(guestLines.length * 5 + 3);
+
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(9);
+        pdf.setTextColor(80);
+
+        pdf.text(guestLines, margin + 5, y);
+
+        y += guestLines.length * 5 + 2;
+      });
+
+      y += 5;
+    });
+
+    // Rodapé com paginação
+    const totalPages = pdf.getNumberOfPages();
+
+    for (let page = 1; page <= totalPages; page++) {
+      pdf.setPage(page);
+
+      pdf.setFontSize(8);
+      pdf.setTextColor(150);
+
+      pdf.text(
+        `Mariana & Henrique | Pagina ${page} de ${totalPages}`,
+        pageWidth / 2,
+        pageHeight - 8,
+        { align: "center" },
+      );
+    }
+
+    pdf.save(
+      `Relatorio-RSVP-${new Date().toISOString().slice(0, 10)}.pdf`,
+    );
+  };
+
   if (isLoading) {
     return (
       <AdminShell>
@@ -210,8 +369,8 @@ export default function RSVPPage() {
         />
 
         <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, index) => (
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+            {Array.from({ length: 5 }).map((_, index) => (
               <div
                 key={index}
                 className="h-34 animate-pulse rounded-[22px] border border-[#2c2925]/7 bg-white/45"
@@ -251,7 +410,7 @@ export default function RSVPPage() {
       />
 
       {/* Stats */}
-      <section className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <section className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-5">
         <RSVPStat
           icon={<UsersThree size={19} />}
           label="Convidados"
@@ -279,6 +438,12 @@ export default function RSVPPage() {
           label="Recusados"
           value={declinedGuests}
           detail="presenças recusadas"
+        />
+        <RSVPStat
+          icon={<Check size={19} weight="bold" />}
+          label="Entradas"
+          value={checkedInGuests}
+          detail="entradas registradas"
         />
       </section>
 
@@ -349,6 +514,15 @@ export default function RSVPPage() {
             })}
           </div>
         </div>
+        <button
+          type="button"
+          onClick={handleExportPDF}
+          disabled={families.length === 0}
+          className="flex h-11 shrink-0 items-center justify-center gap-2 rounded-full border border-[#d9b982]/40 bg-[#d9b982]/10 px-5 text-[10px] font-semibold text-[#6e4c12] transition hover:bg-[#d9b982]/20 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          <FilePdfIcon size={16} />
+          Exportar PDF
+        </button>
       </section>
 
       {/* Results */}

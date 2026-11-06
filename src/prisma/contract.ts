@@ -115,6 +115,11 @@ export const contract = defineContract({}, ({ field, model, rel }) => {
                 family: rel.belongsTo(Family, {
                     from: "familyId",
                     to: "id",
+                }).sql({
+                    fk: {
+                        name: "FamilyMember_familyId_fkey",
+                        onDelete: "cascade",
+                    },
                 }),
             }),
         },

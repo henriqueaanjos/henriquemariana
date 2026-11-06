@@ -33,7 +33,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'7fdb29cf29f84fcda7c6ec5c55ae75b844c6bfae1de6e5f5d16ccb5553ac5f48'>;
+  StorageHashBase<'6dc27314663f8c2af081974357b7359efc7df53878f15383a879fa97501e4acd'>;
 export type ExecutionHash =
   ExecutionHashBase<'135810afa82370f9b7186e627121579f11ed4b9ebf5eed28d50696e1b7b5f6a1'>;
 export type ProfileHash =
@@ -545,8 +545,29 @@ type ContractBase = Omit<
               };
               primaryKey: { readonly columns: readonly ['id'] };
               uniques: readonly [];
-              indexes: readonly [];
-              foreignKeys: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'FamilyMember_familyId_idx_3d03045e';
+                  readonly prefix: 'FamilyMember_familyId_idx';
+                  readonly columns: readonly ['familyId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'FamilyMember';
+                    readonly columns: readonly ['familyId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Family';
+                    readonly columns: readonly ['id'];
+                  };
+                  readonly name: 'FamilyMember_familyId_fkey';
+                },
+              ];
             };
             readonly Message: {
               columns: {

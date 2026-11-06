@@ -2,6 +2,9 @@ import { db } from "@/src/prisma/db";
 import { requireAdminSession } from "@/src/services/admin-auth";
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET() {
   try {
     const isAdmin = await requireAdminSession();
@@ -86,7 +89,12 @@ export async function GET() {
           families: familyList.slice(0, 5),
         },
       },
-      { status: 200 },
+      {
+        status: 200,
+        headers: {
+          "Cache-Control": "no-store, max-age=0, must-revalidate",
+        },
+      },
     );
   } catch (error) {
     console.error("GET /api/admin/dashboard error:", error);

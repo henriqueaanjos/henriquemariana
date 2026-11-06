@@ -65,7 +65,8 @@ function RSVPConfirmationModal({
           </div>
 
           <p className="mt-3 text-center font-cormorant text-sm uppercase text-primary-light/80">
-            Família {familyName}
+            {members.length > 1 && "Família "}
+            {familyName}
           </p>
 
           <p className="mt-4 max-w-sm text-center font-lora text-xs leading-relaxed text-background/75">
@@ -143,11 +144,10 @@ function MemberResponse({
         <button
           type="button"
           onClick={() => onChange("CONFIRMED")}
-          className={`flex h-10 min-w-0 flex-1 items-center justify-center gap-1 rounded-lg border transition-all sm:gap-2 ${
-            member.status === "CONFIRMED"
-              ? "border-primary bg-primary/20 text-primary-light"
-              : "border-background/10 bg-background/5 text-background/60 hover:bg-background/10"
-          }`}
+          className={`flex h-10 min-w-0 flex-1 items-center justify-center gap-1 rounded-lg border transition-all sm:gap-2 ${member.status === "CONFIRMED"
+            ? "border-primary bg-primary/20 text-primary-light"
+            : "border-background/10 bg-background/5 text-background/60 hover:bg-background/10"
+            }`}
         >
           <Check size={15} weight="bold" />
 
@@ -159,11 +159,10 @@ function MemberResponse({
         <button
           type="button"
           onClick={() => onChange("DECLINED")}
-          className={`flex h-10 min-w-0 flex-1 items-center justify-center gap-1 rounded-lg border transition-all sm:gap-2 ${
-            member.status === "DECLINED"
-              ? "border-[#b8786e]/50 bg-[#b8786e]/15 text-[#e0a39a]"
-              : "border-background/10 bg-background/5 text-background/60 hover:bg-background/10"
-          }`}
+          className={`flex h-10 min-w-0 flex-1 items-center justify-center gap-1 rounded-lg border transition-all sm:gap-2 ${member.status === "DECLINED"
+            ? "border-[#b8786e]/50 bg-[#b8786e]/15 text-[#e0a39a]"
+            : "border-background/10 bg-background/5 text-background/60 hover:bg-background/10"
+            }`}
         >
           <X size={15} weight="bold" />
 
@@ -286,6 +285,8 @@ function RSVPSuccess({
   const qrRef = useRef<SVGSVGElement>(null);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
+  const isIndividualInvite = family.members.length === 1;
+
   async function handleDownloadPDF() {
     if (!qrRef.current || isGeneratingPDF) return;
 
@@ -375,11 +376,14 @@ function RSVPSuccess({
         align: "center",
       });
 
-      // Família
+      // Nome do convidado ou da família
       pdf.setFontSize(13);
-      pdf.text(`Família ${family.name}`, pageWidth / 2, 124, {
-        align: "center",
-      });
+      pdf.text(
+        `${isIndividualInvite ? "" : "Família "}${family.name}`,
+        pageWidth / 2,
+        124,
+        { align: "center" },
+      );
 
       // QR Code
       const qrSize = 68;
@@ -482,7 +486,8 @@ function RSVPSuccess({
         </div>
 
         <p className="mt-3 text-center font-cormorant text-sm uppercase text-primary-light/80">
-          Família {family.name}
+          {isIndividualInvite ? "" : "Família "}
+          {family.name}
         </p>
 
         <p className="mt-4 max-w-sm text-center font-lora text-xs leading-relaxed text-background/75">
@@ -631,9 +636,9 @@ export function RSVP() {
       currentMembers.map((member) =>
         member.id === memberId
           ? {
-              ...member,
-              status,
-            }
+            ...member,
+            status,
+          }
           : member,
       ),
     );
@@ -794,7 +799,8 @@ export function RSVP() {
                     <div className="flex w-full flex-col items-center pt-6 sm:pt-1">
                       <div className="max-w-full border-b-2 border-primary px-2 pb-1 text-center">
                         <h1 className="break-words font-cormorant text-base uppercase text-primary-light">
-                          Família {family.name}
+                          {members.length > 1 && "Família "}
+                          {family.name}
                         </h1>
                       </div>
 
