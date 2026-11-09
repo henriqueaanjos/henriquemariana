@@ -491,8 +491,7 @@ function RSVPSuccess({
         </p>
 
         <p className="mt-4 max-w-sm text-center font-lora text-xs leading-relaxed text-background/75">
-          Obrigado por confirmar. Será uma alegria celebrar esse momento
-          especial com vocês.
+          Agradecemos pela confirmação!<br/> <b className="text-base">Apresente o QR Code abaixo para a entrada no evento. </b>
         </p>
       </div>
 

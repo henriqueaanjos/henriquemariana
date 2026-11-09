@@ -71,18 +71,13 @@ export function Story() {
                 2xl:text-lg
               "
             >
-              Nossa história começou ainda na adolescência, quando nos conhecemos, e por alguns anos nossos caminhos continuaram se cruzando em encontros e eventos de amigos em comum. Nossa amizade foi crescendo em 2023, quando decidimos nos conhecer melhor.
+              Nós nos conhecemos quando éramos adolescentes, e um de nós já tinha certeza do que queria desde aquela época.
               <br /><br />
-              Essa proximidade, e a admiração mútua, nos deu a certeza de um sentimento que haviamos desenvolvido, o amor um pelo outro, e no dia 03 de dezembro de 2023, decidimos abrir espaço para esse sentimento florecer, e começamos a namorar.
+              Cada um foi crescendo e amadurecendo, mqs sempre nos encontrávamos em eventos de amigos em comum. A amizade um com o outro foi se fortalecendo, tanto que em 03/12/2023 aquela amizade se tornou um sentimento muito maior e começamos oficialmente a namorar!
               <br /><br />
-              Desde então, constuímos uma história repleta de alegrias, aprendizados, cumplicidade e companheirismo. A cada dia, nossa admiração, nosso respeito, e nosso amor se tornaram ainda maiores, trazendo a certeza de que queríamos muito mais do que compartilhar momentos: queríamos compartilhar a vida.
+              Desde então, estamos construindo uma história de alegria, aprendizado, cumplicidade e companheirismo. Nosso amor se tornou ainda maior que tivemos a certeza que queríamos muito mais que compartilhar momentos: compartilhar a vida. Foi então que em 03/04/2026 ficamos noivos!
               <br /><br />
-              E foi assim que, no dia 03 de abril de 2026, chegou o momento de dar mais um passo nessa história. Henrique ouviu o tão sonhado “sim” mais uma vez — dessa vez, o que selou a promessa de um futuro juntos. Para Mariana, foi o dia mais feliz de sua vida até então.
-              Oficialmente, noivos! 💍
-              <br /><br />
-              Agora, estamos nos preparando para viver um dos dias mais especiais das nossas vidas: o dia em que celebraremos nosso amor ao lado das pessoas que fazem parte da nossa história.
-              E, para tornar esse momento ainda mais inesquecível, queremos muito ter você conosco!
-
+              Agora, estamos nos preparando para viver um dos dias mais especiais das nossas vidas: nosso casamento. O dia que celebraremos nosso amor ao lado das pessoas que fazem parte da nossa história. Para isso, queremos muito ter você conosco!
             </p>
 
             {/* Assinatura */}

@@ -207,6 +207,7 @@ export default function RSVPPage() {
     0,
   );
 
+
   const handleExportPDF = () => {
     const pdf = new jsPDF({
       orientation: "portrait",
@@ -217,23 +218,19 @@ export default function RSVPPage() {
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
 
-    const margin = 15;
+    const margin = 8;
     const contentWidth = pageWidth - margin * 2;
+    const footerHeight = 8;
+    const bottomLimit = pageHeight - margin - footerHeight;
 
-    let y = 20;
+    let y = 10;
 
-    const formatStatus = (guest: AdminRSVPFamily["guests"][number]) => {
-      if (guest.status === "declined") {
-        return "Nao confirmado";
-      }
-
-      if (guest.status === "pending") {
-        return "Pendente";
-      }
-
-      if (guest.checkedInAt) {
-        return "Entrada registrada";
-      }
+    const formatStatus = (
+      guest: AdminRSVPFamily["guests"][number],
+    ) => {
+      if (guest.status === "declined") return "Nao confirmado";
+      if (guest.status === "pending") return "Pendente";
+      if (guest.checkedInAt) return "Entrada registrada";
 
       return "Confirmado";
     };
@@ -242,95 +239,135 @@ export default function RSVPPage() {
       new Date(date).toLocaleString("pt-BR", {
         day: "2-digit",
         month: "2-digit",
-        year: "numeric",
         hour: "2-digit",
         minute: "2-digit",
       });
 
-    const checkPageBreak = (requiredSpace = 10) => {
-      if (y + requiredSpace > pageHeight - margin) {
-        pdf.addPage();
-        y = 20;
-      }
+    const addPage = () => {
+      pdf.addPage();
+      y = 10;
     };
 
-    // Cabeçalho
+    const checkPageBreak = (requiredSpace: number) => {
+      if (y + requiredSpace > bottomLimit) {
+        addPage();
+        return true;
+      }
+
+      return false;
+    };
+
+    // Cabeçalho compacto
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(18);
+    pdf.setFontSize(14);
+    pdf.setTextColor(44, 41, 37);
     pdf.text("Relatorio de convidados", margin, y);
 
-    y += 8;
-
     pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(9);
+    pdf.setFontSize(7);
     pdf.setTextColor(120);
 
     pdf.text(
-      `Mariana & Henrique | Gerado em ${new Date().toLocaleString("pt-BR")}`,
-      margin,
+      `Mariana & Henrique | ${new Date().toLocaleString("pt-BR")}`,
+      pageWidth - margin,
       y,
+      { align: "right" },
     );
-
-    y += 12;
-
-    // Resumo
-    pdf.setTextColor(44, 41, 37);
-    pdf.setFontSize(10);
-
-    pdf.text(`Familias: ${families.length}`, margin, y);
-    pdf.text(`Convidados: ${totalGuests}`, margin + 45, y);
-    pdf.text(`Confirmados: ${confirmedGuests}`, margin + 90, y);
 
     y += 6;
 
-    pdf.text(`Entradas registradas: ${checkedInGuests}`, margin, y);
+    // Resumo em uma única linha
+    pdf.setFillColor(245, 242, 236);
+    pdf.roundedRect(margin, y - 3.5, contentWidth, 8, 1, 1, "F");
 
-    y += 12;
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(8);
+    pdf.setTextColor(55, 51, 45);
 
-    // Famílias e convidados
-    families.forEach((family) => {
-      checkPageBreak(18);
+    pdf.text(
+      `Familias: ${families.length}    Convidados: ${totalGuests}    Confirmados: ${confirmedGuests}    Entradas: ${checkedInGuests}`,
+      margin + 3,
+      y + 1.5,
+    );
 
-      pdf.setFillColor(245, 242, 236);
-      pdf.roundedRect(margin, y - 5, contentWidth, 9, 1.5, 1.5, "F");
+    y += 9;
+
+    // Cabeçalho das colunas
+    const drawTableHeader = () => {
+      pdf.setFillColor(235, 232, 226);
+      pdf.rect(margin, y - 3, contentWidth, 6, "F");
 
       pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(10);
-      pdf.setTextColor(44, 41, 37);
+      pdf.setFontSize(7);
+      pdf.setTextColor(80, 75, 68);
 
+      pdf.text("CONVIDADO / FAMILIA", margin + 2, y + 0.8);
+      pdf.text("STATUS", pageWidth - margin - 48, y + 0.8);
+      pdf.text("ENTRADA", pageWidth - margin - 2, y + 0.8, {
+        align: "right",
+      });
+
+      y += 6;
+    };
+
+    drawTableHeader();
+
+    families.forEach((family) => {
       const familyLabel =
         family.guests.length === 1
           ? family.name
           : `Familia ${family.name}`;
 
-      pdf.text(familyLabel, margin + 3, y + 1);
+      // Verifica espaço para o título da família
+      checkPageBreak(7);
 
-      y += 10;
+      // Identificação discreta da família
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(7.5);
+      pdf.setTextColor(100, 75, 40);
+
+      pdf.text(familyLabel, margin + 2, y + 1);
+
+      y += 4;
 
       family.guests.forEach((guest) => {
         const status = formatStatus(guest);
-
         const checkInDate = guest.checkedInAt
-          ? ` | ${formatCheckInDate(guest.checkedInAt)}`
-          : "";
+          ? formatCheckInDate(guest.checkedInAt)
+          : "—";
 
-        const guestLines = pdf.splitTextToSize(
-          `${guest.name} - ${status}${checkInDate}`,
-          contentWidth - 8,
+        const guestName = pdf.splitTextToSize(
+          guest.name,
+          contentWidth - 85,
         );
 
-        checkPageBreak(guestLines.length * 5 + 3);
+        const rowHeight = Math.max(5, guestName.length * 3.5 + 1);
 
+        checkPageBreak(rowHeight + 1);
+
+        // Linha do convidado
         pdf.setFont("helvetica", "normal");
-        pdf.setFontSize(9);
-        pdf.setTextColor(80);
+        pdf.setFontSize(8);
+        pdf.setTextColor(65, 65, 65);
 
-        pdf.text(guestLines, margin + 5, y);
+        pdf.text(guestName, margin + 4, y + 2);
 
-        y += guestLines.length * 5 + 2;
+        pdf.setFontSize(7);
+        pdf.text(status, pageWidth - margin - 48, y + 2);
+
+        pdf.text(checkInDate, pageWidth - margin - 2, y + 2, {
+          align: "right",
+        });
+
+        // Divisor sutil
+        pdf.setDrawColor(235, 232, 226);
+        pdf.setLineWidth(0.15);
+        pdf.line(margin + 2, y + rowHeight, pageWidth - margin - 2, y + rowHeight);
+
+        y += rowHeight;
       });
 
-      y += 5;
+      y += 1;
     });
 
     // Rodapé com paginação
@@ -339,13 +376,14 @@ export default function RSVPPage() {
     for (let page = 1; page <= totalPages; page++) {
       pdf.setPage(page);
 
-      pdf.setFontSize(8);
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(7);
       pdf.setTextColor(150);
 
       pdf.text(
         `Mariana & Henrique | Pagina ${page} de ${totalPages}`,
         pageWidth / 2,
-        pageHeight - 8,
+        pageHeight - 4,
         { align: "center" },
       );
     }
@@ -354,6 +392,7 @@ export default function RSVPPage() {
       `Relatorio-RSVP-${new Date().toISOString().slice(0, 10)}.pdf`,
     );
   };
+
 
   if (isLoading) {
     return (
