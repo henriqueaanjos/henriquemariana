@@ -73,7 +73,7 @@ export function Story() {
             >
               Nós nos conhecemos quando éramos adolescentes, e um de nós já tinha certeza do que queria desde aquela época.
               <br /><br />
-              Cada um foi crescendo e amadurecendo, mqs sempre nos encontrávamos em eventos de amigos em comum. A amizade um com o outro foi se fortalecendo, tanto que em 03/12/2023 aquela amizade se tornou um sentimento muito maior e começamos oficialmente a namorar!
+              Cada um foi crescendo e amadurecendo, mas sempre nos encontrávamos em eventos de amigos em comum. A amizade um com o outro foi se fortalecendo, tanto que em 03/12/2023 aquela amizade se tornou um sentimento muito maior e começamos oficialmente a namorar!
               <br /><br />
               Desde então, estamos construindo uma história de alegria, aprendizado, cumplicidade e companheirismo. Nosso amor se tornou ainda maior que tivemos a certeza que queríamos muito mais que compartilhar momentos: compartilhar a vida. Foi então que em 03/04/2026 ficamos noivos!
               <br /><br />

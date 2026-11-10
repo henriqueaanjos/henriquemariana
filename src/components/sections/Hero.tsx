@@ -1,5 +1,6 @@
+
+import Image from "next/image";
 import { Countdown } from "../Countdown";
-import { Header } from "../Header";
 
 export function Hero() {
   return (
@@ -8,16 +9,29 @@ export function Hero() {
       className="
         relative flex
         min-h-[100svh] w-full
-        bg-[url('/AYM_8379_8.jpg')]
-        bg-cover bg-no-repeat
         overflow-hidden
-        bg-center
+        bg-background
       "
     >
+      {/* Imagem de fundo otimizada */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/AYM_8379_8.jpg"
+          alt=""
+          fill
+          priority={false}
+          preload
+          sizes="100vw"
+          quality={75}
+          className="object-cover object-center"
+          aria-hidden="true"
+        />
+      </div>
+
       {/* Gradiente para melhorar a legibilidade */}
       <div
         className="
-          absolute inset-0 z-0
+          absolute inset-0 z-10
           bg-linear-to-t
           from-background/0
           via-background/10 via-42%
@@ -28,14 +42,13 @@ export function Hero() {
       {/* Conteúdo principal */}
       <div
         className="
-          relative z-10 grow
+          relative z-20 grow
           flex flex-col items-center justify-center
           w-full min-w-0
           px-4 py-28
           sm:px-6
           md:px-8
           -mt-12
-         
         "
       >
         <div

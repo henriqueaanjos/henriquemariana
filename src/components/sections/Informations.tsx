@@ -1,3 +1,4 @@
+
 import {
   Clock,
   MapPin,
@@ -6,6 +7,7 @@ import {
   Dress,
   Wine,
 } from "@phosphor-icons/react/ssr";
+
 import { LiquidGlassWrapper } from "../LiquidGlassWrapper";
 
 export function Information() {
@@ -14,18 +16,26 @@ export function Information() {
       id="info"
       className="
         relative flex min-h-svh w-full flex-col
-        items-center justify-center
+        items-center justify-start
         overflow-hidden
         bg-background
         bg-[url('/AYM_8791-2.jpeg')]
         bg-cover bg-center bg-no-repeat
-        px-4 py-28
-        sm:px-6 sm:py-32
-        lg:h-screen lg:min-h-0 lg:px-6 lg:py-14
+        px-4
+        pt-36 pb-16
+        sm:px-6 sm:pt-40 sm:pb-20
+        lg:px-8 lg:pt-48 lg:pb-16
       "
     >
       {/* Sobreposição para melhorar a leitura */}
-      <div className="absolute inset-0 z-0 bg-linear-to-t from-olive-900/90 to-olive-900/10 to-65%" />
+      <div
+        className="
+          absolute inset-0 z-0
+          bg-linear-to-t
+          from-olive-900/90
+          to-olive-900/10 to-65%
+        "
+      />
 
       {/* Decoração de fundo */}
       <div
@@ -39,35 +49,46 @@ export function Information() {
       {/* Conteúdo */}
       <div
         className="
-          relative z-10 flex w-full max-w-6xl flex-col
-          items-center justify-center gap-6
-          lg:h-full
+          relative z-10 flex w-full max-w-6xl
+          flex-col items-center justify-start
+          gap-6
         "
       >
         {/* Título */}
         <div className="flex w-full flex-col items-center text-center">
-          <div className="border-b-2 border-primary px-2 pb-1 mt-2 sm:mt-8">
-            <h1 className="font-cormorant text-2xl font-bold uppercase text-primary-dark sm:text-3xl">
+          <div className="border-b-2 border-primary px-2 pb-1">
+            <h2
+              className="
+                font-cormorant text-2xl font-bold
+                uppercase text-primary-dark
+                sm:text-3xl
+              "
+            >
               Informações
-            </h1>
+            </h2>
           </div>
 
-          <h5
+          <p
             className="
               mt-3 max-w-3xl
               font-lora text-xs uppercase leading-relaxed
               text-primary-dark
               sm:text-sm
-              lg:text-sm
             "
           >
             Para que possamos aproveitar esse dia tão especial juntos,
             separamos algumas informações importantes para vocês.
-          </h5>
+          </p>
         </div>
 
         {/* Local e horários */}
-        <div className="grid w-full grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
+        <div
+          className="
+            grid w-full grid-cols-1
+            gap-3 sm:gap-4
+            md:grid-cols-2
+          "
+        >
           {/* Cerimônia */}
           <LiquidGlassWrapper className="rounded-3xl bg-black/70 p-4 sm:p-5">
             <div className="flex flex-col items-center text-center">
@@ -95,7 +116,8 @@ export function Information() {
               </p>
 
               <p className="mt-1 max-w-sm font-lora text-xs leading-relaxed text-primary-light/50">
-                R. Mario Gonçalves, 129 - Chácara Cachoeira, Campo Grande - MS
+                R. Mario Gonçalves, 129 - Chácara Cachoeira,
+                Campo Grande - MS
               </p>
             </div>
           </LiquidGlassWrapper>
@@ -130,7 +152,8 @@ export function Information() {
               </p>
 
               <p className="mt-1 max-w-sm font-lora text-xs leading-relaxed text-primary-light/50">
-                R. Mario Gonçalves, 129 - Chácara Cachoeira, Campo Grande - MS
+                R. Mario Gonçalves, 129 - Chácara Cachoeira,
+                Campo Grande - MS
               </p>
             </div>
           </LiquidGlassWrapper>
@@ -138,13 +161,33 @@ export function Information() {
 
         {/* Lembretes */}
         <div className="w-full">
-          <h3 className="mb-3 text-center font-cormorant text-sm font-bold uppercase tracking-widest text-primary-light sm:text-base">
+          <h3
+            className="
+              mb-3 text-center
+              font-cormorant text-sm font-bold uppercase
+              tracking-widest text-primary-light
+              sm:text-base
+            "
+          >
             Alguns lembretes
           </h3>
 
-          <div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-3 lg:grid-cols-5">
+          <div
+            className="
+              grid grid-cols-2 gap-2
+              sm:gap-3
+              md:grid-cols-3
+              lg:grid-cols-5
+            "
+          >
             {/* Traje social */}
-            <LiquidGlassWrapper className="rounded-2xl bg-black/70 p-3 sm:rounded-3xl sm:p-4 lg:p-5">
+            <LiquidGlassWrapper
+              className="
+                rounded-2xl bg-black/70 p-3
+                sm:rounded-3xl sm:p-4
+                lg:p-5
+              "
+            >
               <div className="flex h-full flex-col items-center text-center">
                 <Dress
                   size={28}
@@ -157,13 +200,21 @@ export function Information() {
                 </p>
 
                 <p className="mt-1 font-lora text-xs leading-relaxed text-primary-light/60 sm:text-sm">
-                  Evitem jeans, macacões ou trajes casuais. É indicado o uso de vestidos de festa longos ou roupa social.
+                  Evitem jeans, macacões ou trajes casuais.
+                  É indicado o uso de vestidos de festa longos
+                  ou roupa social.
                 </p>
               </div>
             </LiquidGlassWrapper>
 
             {/* Entrada da noiva */}
-            <LiquidGlassWrapper className="rounded-2xl bg-black/70 p-3 sm:rounded-3xl sm:p-4 lg:p-5">
+            <LiquidGlassWrapper
+              className="
+                rounded-2xl bg-black/70 p-3
+                sm:rounded-3xl sm:p-4
+                lg:p-5
+              "
+            >
               <div className="flex h-full flex-col items-center text-center">
                 <DeviceMobile
                   size={28}
@@ -182,7 +233,13 @@ export function Information() {
             </LiquidGlassWrapper>
 
             {/* Cores */}
-            <LiquidGlassWrapper className="rounded-2xl bg-black/70 p-3 sm:rounded-3xl sm:p-4 lg:p-5">
+            <LiquidGlassWrapper
+              className="
+                rounded-2xl bg-black/70 p-3
+                sm:rounded-3xl sm:p-4
+                lg:p-5
+              "
+            >
               <div className="flex h-full flex-col items-center text-center">
                 <Dress
                   size={28}
@@ -195,15 +252,22 @@ export function Information() {
                 </p>
 
                 <p className="mt-1 font-lora text-xs leading-relaxed text-primary-light/60 sm:text-sm">
-                  Branco, off-white, marfim e tons muito claros ficam
-                  reservados para a noiva. 
-                  <br/>As madrinhas usarão verde oliva.
+                  Branco, off-white, marfim e tons muito claros
+                  ficam reservados para a noiva.
+                  <br />
+                  As madrinhas usarão verde oliva.
                 </p>
               </div>
             </LiquidGlassWrapper>
 
             {/* Fotografia */}
-            <LiquidGlassWrapper className="rounded-2xl bg-black/70 p-3 sm:rounded-3xl sm:p-4 lg:p-5">
+            <LiquidGlassWrapper
+              className="
+                rounded-2xl bg-black/70 p-3
+                sm:rounded-3xl sm:p-4
+                lg:p-5
+              "
+            >
               <div className="flex h-full flex-col items-center text-center">
                 <Camera
                   size={28}
@@ -216,14 +280,20 @@ export function Information() {
                 </p>
 
                 <p className="mt-1 font-lora text-xs leading-relaxed text-primary-light/60 sm:text-sm">
-                  Deixem o fotógrafo oficial registrar cada momento sem
-                  interferências.
+                  Deixem o fotógrafo oficial registrar cada momento
+                  sem interferências.
                 </p>
               </div>
             </LiquidGlassWrapper>
 
             {/* Alimentos e bebidas */}
-            <LiquidGlassWrapper className="col-span-2 rounded-2xl bg-black/70 p-3 sm:col-span-1 sm:rounded-3xl sm:p-4 lg:p-5">
+            <LiquidGlassWrapper
+              className="
+                col-span-2 rounded-2xl bg-black/70 p-3
+                sm:col-span-1 sm:rounded-3xl sm:p-4
+                lg:p-5
+              "
+            >
               <div className="flex h-full flex-col items-center text-center">
                 <Wine
                   size={28}
@@ -236,8 +306,8 @@ export function Information() {
                 </p>
 
                 <p className="mt-1 font-lora text-xs leading-relaxed text-primary-light/60 sm:text-sm">
-                  Para manter o espaço organizado, pedimos gentilmente que não
-                  levem alimentos ou bebidas.
+                  Para manter o espaço organizado, pedimos
+                  gentilmente que não levem alimentos ou bebidas.
                 </p>
               </div>
             </LiquidGlassWrapper>

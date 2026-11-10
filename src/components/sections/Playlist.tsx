@@ -46,7 +46,7 @@ export function Playlist() {
           "
         >
           <LiquidGlassWrapper className="h-full min-h-0 flex-1 rounded-3xl bg-black/70 ">
-            <div className="flex h-full min-h-0 flex-col items-center p-3 sm:p-4">
+            <div className="flex h-full min-h-0 flex-col items-center p-3 sm:p-4 overflow-y-scroll">
               {/* TÍTULO */}
               <div className="shrink-0 border-b-2 border-primary px-2 pb-1">
                 <h1 className="font-cormorant text-base uppercase text-primary-light">
@@ -61,7 +61,7 @@ export function Playlist() {
                 </div>
 
                 <LiquidGlassWrapper className="min-h-[18rem] flex-1 rounded-3xl sm:min-h-[20rem] lg:min-h-0">
-                  <div className="flex h-full min-h-0 flex-col p-3 sm:p-4">
+                  <div className="flex h-full min-h-0 flex-col p-3 sm:p-4 ">
                     {/* TÍTULO DO RANKING */}
                     <div className="shrink-0 border-b-2 border-primary px-2 pb-1">
                       <h1 className="font-cormorant text-base uppercase text-primary-light">

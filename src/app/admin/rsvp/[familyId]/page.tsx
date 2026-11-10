@@ -47,22 +47,24 @@ import {
 // Configurações
 // -----------------------------------------------------------------------------
 
-const DEFAULT_INVITE_TEMPLATE = `Olá, {{nome}}! 💛
+const DEFAULT_INVITE_TEMPLATE = `Olá, {{nome}}! 🤍 
 
 É com muito carinho que queremos compartilhar com você um momento muito especial das nossas vidas.
 
 Estamos preparando tudo com muito amor para celebrar o nosso casamento e seria uma alegria enorme ter você conosco nesse dia. ✨
 
 Para confirmar sua presença, acesse o nosso site:
+*https://henriquemariana.vercel.app*
 
-{{link}}
+O código de confirmação da família é: *{{codigo}}*
 
-O código de confirmação da família é: {{codigo}}
+Pedimos que confirmem até *20/11/2026* no site, por gentileza.
 
 Esperamos celebrar esse momento tão especial ao seu lado! 🥂
 
 Com carinho,
 Mariana & Henrique 🤍`;
+
 
 const INVITE_TEMPLATE_STORAGE_KEY = "admin-rsvp-invite-template";
 

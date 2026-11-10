@@ -103,7 +103,7 @@ export function Recado() {
               lg:w-[30%]
             "
           >
-            <div className="flex w-full flex-col items-center gap-5 p-4 sm:gap-6 sm:p-5 lg:h-full lg:gap-8 lg:p-4">
+            <div className="flex w-full flex-col items-center gap-5 p-4 sm:gap-6 sm:p-5 lg:h-full lg:gap-8 lg:p-4 overflow-y-scroll">
               <div className="shrink-0 border-b-2 border-primary px-2 pb-1 text-center">
                 <h2 className="font-cormorant text-base uppercase text-primary-light">
                   Deixe o seu recado
@@ -163,7 +163,7 @@ export function Recado() {
               lg:h-full lg:min-h-0 lg:w-[50%]
             "
           >
-            <div className="flex min-h-0 w-full flex-1 flex-col items-center gap-5 p-4 sm:gap-6 sm:p-5 lg:gap-8 lg:p-4">
+            <div className="flex min-h-0 w-full flex-1 flex-col items-center gap-5 p-4 sm:gap-6 sm:p-5 lg:gap-8 lg:p-4 overflow-y-scroll">
               <div className="shrink-0 border-b-2 border-primary px-2 pb-1 text-center">
                 <h2 className="font-cormorant text-base uppercase text-primary-light">
                   Recados recebidos
