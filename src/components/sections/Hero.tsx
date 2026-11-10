@@ -22,7 +22,7 @@ export function Hero() {
           priority={false}
           preload
           sizes="100vw"
-          quality={75}
+          quality={100}
           className="object-cover object-center"
           aria-hidden="true"
         />
