@@ -47,13 +47,14 @@ import {
 // Configurações
 // -----------------------------------------------------------------------------
 
-const DEFAULT_INVITE_TEMPLATE = `Olá, {{nome}}! 🤍 
+const DEFAULT_INVITE_TEMPLATE = `Olá, *{{nome}}*! 🤍
 
 É com muito carinho que queremos compartilhar com você um momento muito especial das nossas vidas.
 
 Estamos preparando tudo com muito amor para celebrar o nosso casamento e seria uma alegria enorme ter você conosco nesse dia. ✨
 
 Para confirmar sua presença, acesse o nosso site:
+
 *https://henriquemariana.vercel.app*
 
 O código de confirmação da família é: *{{codigo}}*
@@ -207,6 +208,20 @@ export default function RSVPFamilyPage() {
   // Modelo de mensagem
   // ---------------------------------------------------------------------------
 
+  // ---------------------------------------------------------------------------
+  // Busca da família
+  // ---------------------------------------------------------------------------
+
+  const {
+    data: family,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["admin-rsvp-family", familyId],
+    queryFn: () => getAdminRSVPFamily(familyId),
+    enabled: Boolean(familyId),
+  });
+
   useEffect(() => {
     const savedTemplate = localStorage.getItem(
       INVITE_TEMPLATE_STORAGE_KEY,
@@ -230,19 +245,7 @@ export default function RSVPFamilyPage() {
     }, 1800);
   }
 
-  // ---------------------------------------------------------------------------
-  // Busca da família
-  // ---------------------------------------------------------------------------
 
-  const {
-    data: family,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: ["admin-rsvp-family", familyId],
-    queryFn: () => getAdminRSVPFamily(familyId),
-    enabled: Boolean(familyId),
-  });
 
   // ---------------------------------------------------------------------------
   // Mutations
@@ -395,21 +398,17 @@ export default function RSVPFamilyPage() {
   }
 
   async function handleCopyInvite() {
+    console.log("Copiar pressionado! family:", family);
     if (!family) return;
 
-    const url = `${window.location.origin}/rsvp/${family.code}`;
+    console.log("texto copiado!")
 
-    const inviteTemplate = localStorage.getItem(INVITE_TEMPLATE_STORAGE_KEY);
-
-    if (!inviteTemplate) return;
 
     const message = inviteTemplate
       .replaceAll("{{familia}}", family.name)
       .replaceAll("{{nome}}", family.guests.map((g) => g.name).join(", "))
       .replaceAll("{{codigo}}", family.code)
       .replaceAll("{{link}}", "https://henriquemariana.vercel.app");
-
-
 
     await navigator.clipboard.writeText(message);
 
@@ -464,17 +463,14 @@ export default function RSVPFamilyPage() {
       return;
     }
 
-
-    const link = `${window.location.origin}/rsvp/${family.code}`;
-
     const message = inviteTemplate
       .replaceAll("{{familia}}", family.name)
-      .replaceAll("{{nome}}", guest.name)
+      .replaceAll("{{nome}}", family.guests.map((g) => g.name).join(", "))
       .replaceAll("{{codigo}}", family.code)
-      .replaceAll("{{link}}", link);
+      .replaceAll("{{link}}", "https://henriquemariana.vercel.app");
 
-    const whatsappUrl = new URL(`https://wa.me/${phone}`);
-    whatsappUrl.searchParams.set("text", message);
+    const whatsappUrl = new URL(`https://api.whatsapp.com/send/?phone=${phone}&text=${encodeURIComponent(message)}`);
+    // whatsappUrl.searchParams.set("text", message);
 
     window.open(whatsappUrl.toString(), "_blank", "noopener,noreferrer");
 
@@ -637,7 +633,7 @@ export default function RSVPFamilyPage() {
               <button
                 type="button"
                 onClick={handleCopyInvite}
-                className="inline-flex h-10 items-center gap-2 rounded-full border border-[#2c2925]/8 bg-white/50 px-4 text-[11px] font-medium text-[#2c2925]/65 transition-all hover:border-[#6e4c12]/20 hover:bg-white"
+                className="inline-flex h-10 items-center gap-2 rounded-full border border-[#2c2925]/8 bg-white/50 px-4 text-[11px] font-medium text-[#2c2925]/65 transition-all hover:border-[#6e4c12]/20 hover:bg-white cursor-pointer"
               >
                 {copied ? (
                   <>
