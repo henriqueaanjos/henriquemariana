@@ -399,22 +399,9 @@ export default function RSVPFamilyPage() {
 
     const url = `${window.location.origin}/rsvp/${family.code}`;
 
-    const message = `Olá, ${family.name}! 💛
+    const message =  localStorage.getItem(INVITE_TEMPLATE_STORAGE_KEY);
 
-É com muito carinho que queremos compartilhar com vocês um momento muito especial das nossas vidas.
-
-Estamos preparando tudo com muito amor para celebrar o nosso casamento e seria uma alegria enorme ter vocês conosco nesse dia. ✨
-
-Para confirmar a presença, acesse o nosso site:
-
-${url}
-
-O código de confirmação da família é: ${family.code}
-
-Esperamos celebrar esse momento tão especial ao lado de vocês! 🥂
-
-Com carinho,
-Mariana & Henrique 🤍`;
+    if(!message) return;
 
     await navigator.clipboard.writeText(message);
 
