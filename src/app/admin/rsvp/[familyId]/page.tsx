@@ -130,8 +130,8 @@ function SummaryCard({
       <div className="flex items-center justify-between">
         <div
           className={`flex h-8 w-8 items-center justify-center rounded-full ${accent
-              ? "bg-[#6e4c12]/10 text-[#6e4c12]"
-              : "bg-[#2c2925]/5 text-[#2c2925]/40"
+            ? "bg-[#6e4c12]/10 text-[#6e4c12]"
+            : "bg-[#2c2925]/5 text-[#2c2925]/40"
             }`}
         >
           {icon}
@@ -399,9 +399,17 @@ export default function RSVPFamilyPage() {
 
     const url = `${window.location.origin}/rsvp/${family.code}`;
 
-    const message =  localStorage.getItem(INVITE_TEMPLATE_STORAGE_KEY);
+    const inviteTemplate = localStorage.getItem(INVITE_TEMPLATE_STORAGE_KEY);
 
-    if(!message) return;
+    if (!inviteTemplate) return;
+
+    const message = inviteTemplate
+      .replaceAll("{{familia}}", family.name)
+      .replaceAll("{{nome}}", family.guests.map((g) => g.name).join(", "))
+      .replaceAll("{{codigo}}", family.code)
+      .replaceAll("{{link}}", "https://henriquemariana.vercel.app");
+
+
 
     await navigator.clipboard.writeText(message);
 
@@ -456,19 +464,19 @@ export default function RSVPFamilyPage() {
       return;
     }
 
-    
-const link = `${window.location.origin}/rsvp/${family.code}`;
 
-const message = inviteTemplate
-  .replaceAll("{{familia}}", family.name)
-  .replaceAll("{{nome}}", guest.name)
-  .replaceAll("{{codigo}}", family.code)
-  .replaceAll("{{link}}", link);
+    const link = `${window.location.origin}/rsvp/${family.code}`;
 
-const whatsappUrl = new URL(`https://wa.me/${phone}`);
-whatsappUrl.searchParams.set("text", message);
+    const message = inviteTemplate
+      .replaceAll("{{familia}}", family.name)
+      .replaceAll("{{nome}}", guest.name)
+      .replaceAll("{{codigo}}", family.code)
+      .replaceAll("{{link}}", link);
 
-window.open(whatsappUrl.toString(), "_blank", "noopener,noreferrer");
+    const whatsappUrl = new URL(`https://wa.me/${phone}`);
+    whatsappUrl.searchParams.set("text", message);
+
+    window.open(whatsappUrl.toString(), "_blank", "noopener,noreferrer");
 
   }
 
