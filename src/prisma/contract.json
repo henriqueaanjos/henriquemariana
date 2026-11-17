@@ -29,6 +29,23 @@
     "namespaces": {
       "public": {
         "enum": {
+          "AgeGroup": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "ADULT",
+                "value": "ADULT"
+              },
+              {
+                "name": "CHILD_4_7",
+                "value": "CHILD_4_7"
+              },
+              {
+                "name": "CHILD_UNDER_4",
+                "value": "CHILD_UNDER_4"
+              }
+            ]
+          },
           "RSVPStatus": {
             "codecId": "pg/text@1",
             "members": [
@@ -130,6 +147,19 @@
           },
           "FamilyMember": {
             "fields": {
+              "ageGroup": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "AgeGroup",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
               "checkedInAt": {
                 "nullable": true,
                 "type": {
@@ -218,6 +248,9 @@
             },
             "storage": {
               "fields": {
+                "ageGroup": {
+                  "column": "ageGroup"
+                },
                 "checkedInAt": {
                   "column": "checkedInAt"
                 },
@@ -581,18 +614,34 @@
             "FamilyMember": {
               "checks": [
                 {
+                  "expression": "\"ageGroup\" IN ('ADULT', 'CHILD_4_7', 'CHILD_UNDER_4')",
+                  "name": "FamilyMember_ageGroup_check_46502c7d",
+                  "prefix": "FamilyMember_ageGroup_check"
+                },
+                {
                   "expression": "\"status\" IN ('PENDING', 'CONFIRMED', 'DECLINED')",
                   "name": "FamilyMember_status_check_3fd4c98a",
                   "prefix": "FamilyMember_status_check"
                 }
               ],
               "columns": {
+                "ageGroup": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "ADULT"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "AgeGroup",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
                 "checkedInAt": {
                   "codecId": "pg/timestamptz-string@1",
-                  "default": {
-                    "expression": "now()",
-                    "kind": "function"
-                  },
                   "nativeType": "timestamptz",
                   "nullable": true
                 },
@@ -873,6 +922,14 @@
             }
           },
           "valueSet": {
+            "AgeGroup": {
+              "kind": "valueSet",
+              "values": [
+                "ADULT",
+                "CHILD_4_7",
+                "CHILD_UNDER_4"
+              ]
+            },
             "RSVPStatus": {
               "kind": "valueSet",
               "values": [
@@ -887,7 +944,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "6dc27314663f8c2af081974357b7359efc7df53878f15383a879fa97501e4acd"
+    "storageHash": "1f50517a7e7b3b3b34a0f8a43bab89e36d94d2de1e962333ab801943196e003f"
   },
   "execution": {
     "executionHash": "135810afa82370f9b7186e627121579f11ed4b9ebf5eed28d50696e1b7b5f6a1",

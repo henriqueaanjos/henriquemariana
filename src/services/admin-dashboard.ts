@@ -49,6 +49,10 @@ export interface AdminDashboardStats {
   photos: number;
   songs: number;
   messages: number;
+  adults: number;
+  children: number;
+  children4To7: number;
+  childrenUnder4: number;
 }
 
 export interface AdminDashboardData {

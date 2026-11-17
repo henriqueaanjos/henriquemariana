@@ -1,0 +1,86 @@
+[
+  {
+    "id": "column.public.FamilyMember.ageGroup",
+    "label": "Add column \"ageGroup\" to \"FamilyMember\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "ageGroup",
+        "table": "FamilyMember"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"ageGroup\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "FamilyMember",
+          "ageGroup"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"ageGroup\"",
+        "sql": "ALTER TABLE \"public\".\"FamilyMember\" ADD COLUMN \"ageGroup\" text DEFAULT 'ADULT' NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"ageGroup\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "FamilyMember",
+          "ageGroup"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.FamilyMember.FamilyMember_ageGroup_check_46502c7d",
+    "label": "Add check constraint \"FamilyMember_ageGroup_check_46502c7d\" on \"FamilyMember\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "FamilyMember_ageGroup_check_46502c7d",
+        "table": "FamilyMember"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"FamilyMember_ageGroup_check_46502c7d\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "FamilyMember_ageGroup_check_46502c7d",
+          "public",
+          "\"public\".\"FamilyMember\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"FamilyMember_ageGroup_check_46502c7d\"",
+        "sql": "ALTER TABLE \"public\".\"FamilyMember\" ADD CONSTRAINT \"FamilyMember_ageGroup_check_46502c7d\" CHECK (\"ageGroup\" IN ('ADULT', 'CHILD_4_7', 'CHILD_UNDER_4'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"FamilyMember_ageGroup_check_46502c7d\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "FamilyMember_ageGroup_check_46502c7d",
+          "public",
+          "\"public\".\"FamilyMember\""
+        ]
+      }
+    ]
+  }
+]

@@ -62,6 +62,22 @@ export async function GET() {
       (member) => member.status === "PENDING",
     );
 
+    const adults = memberList.filter(
+      (member) => member.ageGroup === "ADULT",
+    );
+
+    const children4To7 = memberList.filter(
+      (member) => member.ageGroup === "CHILD_4_7",
+    );
+
+    const childrenUnder4 = memberList.filter(
+      (member) => member.ageGroup === "CHILD_UNDER_4",
+    );
+
+    const children = memberList.filter(
+      (member) => member.ageGroup !== "ADULT",
+    );
+
     return NextResponse.json(
       {
         stats: {
@@ -70,6 +86,10 @@ export async function GET() {
           confirmed: confirmed.length,
           declined: declined.length,
           pending: pending.length,
+          adults: adults.length,
+          children: children.length,
+          children4To7: children4To7.length,
+          childrenUnder4: childrenUnder4.length,
           photos: photoList.length,
           songs: songList.length,
           messages: messageList.length,

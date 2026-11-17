@@ -1,0 +1,44 @@
+[
+  {
+    "id": "dropDefault.FamilyMember.checkedInAt",
+    "label": "Drop default on \"FamilyMember\".\"checkedInAt\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "checkedInAt",
+        "table": "FamilyMember"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"checkedInAt\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "FamilyMember",
+          "checkedInAt"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop default on \"checkedInAt\"",
+        "sql": "ALTER TABLE \"public\".\"FamilyMember\" ALTER COLUMN \"checkedInAt\" DROP DEFAULT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"checkedInAt\" has no default",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"column_default\" IS NULL)) AS \"result\"",
+        "params": [
+          "public",
+          "FamilyMember",
+          "checkedInAt"
+        ]
+      }
+    ]
+  }
+]

@@ -1,9 +1,11 @@
 "use client";
 
 import {
+  Baby,
   Check,
   Clock,
   MagnifyingGlass,
+  Person,
   Plus,
   UsersThree,
   FilePdfIcon,
@@ -207,6 +209,24 @@ export default function RSVPPage() {
     0,
   );
 
+   const childrenUnder4 = families.reduce(
+    (total, family) =>
+      total +
+      family.guests.filter(
+        (guest) => guest.ageGroup === "CHILD_UNDER_4",
+      ).length,
+    0,
+  );
+
+  const children4To7 = families.reduce(
+    (total, family) =>
+      total +
+      family.guests.filter(
+        (guest) => guest.ageGroup === "CHILD_4_7",
+      ).length,
+    0,
+  );
+
 
   const handleExportPDF = () => {
     const pdf = new jsPDF({
@@ -285,7 +305,7 @@ export default function RSVPPage() {
     pdf.setTextColor(55, 51, 45);
 
     pdf.text(
-      `Familias: ${families.length}    Convidados: ${totalGuests}    Confirmados: ${confirmedGuests}    Entradas: ${checkedInGuests}`,
+      `Familias: ${families.length}    Convidados: ${totalGuests}    Confirmados: ${confirmedGuests}    Criancas <4: ${childrenUnder4}    Criancas 4-7: ${children4To7}    Entradas: ${checkedInGuests}`,
       margin + 3,
       y + 1.5,
     );
@@ -408,8 +428,8 @@ export default function RSVPPage() {
         />
 
         <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-            {Array.from({ length: 5 }).map((_, index) => (
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 xl:grid-cols-7">
+            {Array.from({ length: 7 }).map((_, index) => (
               <div
                 key={index}
                 className="h-34 animate-pulse rounded-[22px] border border-[#2c2925]/7 bg-white/45"
@@ -449,7 +469,7 @@ export default function RSVPPage() {
       />
 
       {/* Stats */}
-      <section className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-5">
+      <section className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4 xl:grid-cols-7">
         <RSVPStat
           icon={<UsersThree size={19} />}
           label="Convidados"
@@ -483,6 +503,19 @@ export default function RSVPPage() {
           label="Entradas"
           value={checkedInGuests}
           detail="entradas registradas"
+        />
+         <RSVPStat
+          icon={<Baby size={19} />}
+          label="Crianças < 4"
+          value={childrenUnder4}
+          detail="menos de 4 anos"
+        />
+
+        <RSVPStat
+          icon={<Person size={19} />}
+          label="Crianças 4–7"
+          value={children4To7}
+          detail="entre 4 e 7 anos"
         />
       </section>
 

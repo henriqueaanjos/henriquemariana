@@ -16,6 +16,17 @@ export const RSVPStatus = enumType(
     member("DECLINED", "DECLINED"),
 );
 
+export const AgeGroup = enumType(
+    "AgeGroup",
+    {
+        codecId: "pg/text@1",
+        nativeType: "text",
+    } as const,
+    member("ADULT", "ADULT"),
+    member("CHILD_4_7", "CHILD_4_7"),
+    member("CHILD_UNDER_4", "CHILD_UNDER_4"),
+);
+
 export const contract = defineContract({}, ({ field, model, rel }) => {
     const Photo = model("Photo", {
         fields: {
@@ -86,7 +97,10 @@ export const contract = defineContract({}, ({ field, model, rel }) => {
             status: field.namedType(RSVPStatus).default(
                 RSVPStatus.members.PENDING,
             ),
-            checkedInAt: field.temporal.createdAtString().optional(),
+             ageGroup: field.namedType(AgeGroup).default(
+                AgeGroup.members.ADULT,
+            ),
+            checkedInAt: field.temporal.timestamptzString().optional(),
 
             createdAt: field.temporal.createdAtString(),
             updatedAt: field.temporal.updatedAtString(),
@@ -96,6 +110,7 @@ export const contract = defineContract({}, ({ field, model, rel }) => {
     return {
         enums: {
             RSVPStatus,
+            AgeGroup,
         },
 
         models: {

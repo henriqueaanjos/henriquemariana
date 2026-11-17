@@ -23,6 +23,11 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
+import {
+  getAgeGroupLabel,
+  type AgeGroup,
+} from "@/src/libs/age-group";
+
 import { AdminShell } from "@/src/components/admin/AdminShell";
 import { AddGuestModal } from "@/src/components/admin/AddGuestModal";
 import { EditFamilyModal } from "@/src/components/admin/EditFamilyModal";
@@ -251,15 +256,22 @@ export default function RSVPFamilyPage() {
   // Mutations
   // ---------------------------------------------------------------------------
 
-  const addGuestMutation = useMutation({
+const addGuestMutation = useMutation({
     mutationFn: ({
       name,
       phone,
+      ageGroup,
     }: {
       name: string;
       phone: string;
-    }) => createAdminRSVPFamilyMember(familyId, name, phone),
-
+      ageGroup: AgeGroup;
+    }) =>
+      createAdminRSVPFamilyMember(
+        familyId,
+        name,
+        phone,
+        ageGroup,
+      ),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["admin-rsvp-family", familyId],
@@ -290,24 +302,26 @@ export default function RSVPFamilyPage() {
     },
   });
 
-  const editGuestMutation = useMutation({
+   const editGuestMutation = useMutation({
     mutationFn: ({
       memberId,
       name,
       status,
       phone,
+      ageGroup,
     }: {
       memberId: string;
       name: string;
       status: RSVPGuestStatus;
       phone: string;
+      ageGroup: AgeGroup;
     }) =>
       updateAdminRSVPFamilyMember(familyId, memberId, {
         name,
         status,
         phone: phone || null,
+        ageGroup,
       }),
-
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["admin-rsvp-family", familyId],
@@ -739,9 +753,20 @@ export default function RSVPFamilyPage() {
                     </div>
 
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-[#2c2925]">
-                        {guest.name}
-                      </p>
+                      <div className="flex min-w-0 items-center gap-2">
+                        <p className="truncate text-sm font-medium text-[#2c2925]">
+                          {guest.name}
+                        </p>
+
+                        {guest.ageGroup !== "ADULT" && (
+                          <span className="shrink-0 rounded-full bg-[#6e4c12]/8 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-[#6e4c12]">
+                            {getAgeGroupLabel(
+                              guest.ageGroup,
+                              true,
+                            )}
+                          </span>
+                        )}
+                      </div>
 
                       <p className="mt-0.5 text-[11px] text-[#2c2925]/35">
                         Convidado #{String(index + 1).padStart(2, "0")}
@@ -975,10 +1000,11 @@ export default function RSVPFamilyPage() {
             setIsAddGuestOpen(false);
           }
         }}
-        onSubmit={(name, phone) => {
+        onSubmit={(name, phone, ageGroup) => {
           addGuestMutation.mutate({
             name,
             phone,
+            ageGroup,
           });
         }}
       />
@@ -1008,7 +1034,7 @@ export default function RSVPFamilyPage() {
             setEditingGuest(null);
           }
         }}
-        onSubmit={(name, status, phone) => {
+        onSubmit={(name, status, phone, ageGroup) => {
           if (!editingGuest) return;
 
           editGuestMutation.mutate({
@@ -1016,6 +1042,7 @@ export default function RSVPFamilyPage() {
             name,
             status,
             phone,
+            ageGroup,
           });
         }}
       />

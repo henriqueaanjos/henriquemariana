@@ -1,5 +1,6 @@
 
 import axios from "axios";
+import type { AgeGroup } from "@/src/libs/age-group";
 
 export type RSVPGuestStatus = "confirmed" | "pending" | "declined";
 
@@ -7,6 +8,7 @@ export interface AdminRSVPGuest {
   id: string;
   name: string;
   status: RSVPGuestStatus;
+  ageGroup: AgeGroup;
   checkedInAt: string | null;
 }
 
@@ -30,6 +32,7 @@ interface ApiFamilyMember {
   familyId: string;
   name: string;
   status: "PENDING" | "CONFIRMED" | "DECLINED";
+  ageGroup: "ADULT" | "CHILD_4_7" | "CHILD_UNDER_4";
   checkedInAt?: string | null;
   createdAt: string;
   updatedAt: string;
@@ -59,6 +62,7 @@ async function getFamilyMembers(
     id: member.id,
     name: member.name,
     status: normalizeStatus(member.status),
+    ageGroup: member.ageGroup,
     checkedInAt: member.checkedInAt ?? null,
   }));
 }

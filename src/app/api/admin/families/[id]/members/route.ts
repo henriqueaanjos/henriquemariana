@@ -3,6 +3,7 @@ import { db } from "@/src/prisma/db";
 import { requireAdminSession } from "@/src/services/admin-auth";
 import { Char } from "@prisma/orm-postgres/target/codec-types";
 import { NextResponse } from "next/server";
+import { isAgeGroup } from "@/src/libs/age-group";
 
 type RouteContext = {
   params: Promise<{
@@ -108,6 +109,16 @@ export async function POST(
       );
     }
 
+    if (
+      body.ageGroup !== undefined &&
+      !isAgeGroup(body.ageGroup)
+    ) {
+      return NextResponse.json(
+        { error: "Classificação por idade inválida." },
+        { status: 400 },
+      );
+    }
+
     const phone =
       typeof body.phone === "string"
         ? body.phone.trim()
@@ -117,6 +128,9 @@ export async function POST(
       familyId: id as Char<36>,
       name: body.name.trim(),
       ...(phone ? { phone } : {}),
+      ...(isAgeGroup(body.ageGroup)
+        ? { ageGroup: body.ageGroup }
+        : {}),
     });
 
     return NextResponse.json(member, {

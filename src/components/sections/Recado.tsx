@@ -5,7 +5,6 @@ import { getMessages, type Message, sendMessage } from "@/src/services/messages"
 import Input from "../Input";
 import { LiquidGlassWrapper } from "../LiquidGlassWrapper";
 import Textarea from "../Textarea";
-import { Suspense } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
@@ -72,10 +71,11 @@ export function Recado() {
         items-center bg-[url('/AYM_8721.JPG')] bg-cover bg-top bg-no-repeat
         px-4 pb-8 pt-28
         sm:px-6 sm:pb-10 sm:pt-32
-        lg:h-screen lg:min-h-0 lg:max-h-screen lg:w-screen
-        lg:px-8 lg:pb-14 lg:pt-36
+        lg:h-screen lg:min-h-0 lg:max-h-screen
+        lg:overflow-hidden lg:px-8 lg:pb-14 lg:pt-36
       "
     >
+      {/* Cabeçalho */}
       <div className="relative z-10 flex w-full shrink-0 flex-col items-center text-center">
         <div className="border-b-2 border-primary px-2 pb-1">
           <h1 className="font-cormorant text-2xl font-bold uppercase text-primary-light sm:text-3xl">
@@ -88,6 +88,7 @@ export function Recado() {
         </h5>
       </div>
 
+      {/* Área dos cards */}
       <div
         className="
           relative z-10 mt-6 flex w-full flex-1 flex-col gap-4
@@ -95,15 +96,23 @@ export function Recado() {
           lg:min-h-0 lg:flex-row-reverse lg:pb-6
         "
       >
-        <div className="flex w-full flex-col gap-4 lg:flex-row lg:justify-center">
+        {/* Grid com larguras preservadas */}
+        <div
+          className="
+            flex w-full flex-col gap-4
+            lg:grid lg:min-h-0
+            lg:grid-cols-[30%_50%]
+            lg:justify-center
+          "
+        >
           {/* Formulário */}
           <LiquidGlassWrapper
             className="
               w-full shrink-0 rounded-3xl bg-black/70
-              lg:w-[30%]
+              lg:h-full lg:min-h-0
             "
           >
-            <div className="flex w-full flex-col items-center gap-5 p-4 sm:gap-6 sm:p-5 lg:h-full lg:gap-8 lg:p-4 overflow-y-scroll">
+            <div className="flex w-full flex-col items-center gap-5 p-4 sm:gap-6 sm:p-5 lg:h-full lg:min-h-0 lg:gap-8 lg:overflow-y-auto lg:p-4">
               <div className="shrink-0 border-b-2 border-primary px-2 pb-1 text-center">
                 <h2 className="font-cormorant text-base uppercase text-primary-light">
                   Deixe o seu recado
@@ -158,26 +167,35 @@ export function Recado() {
           {/* Recados recebidos */}
           <LiquidGlassWrapper
             className="
-              flex min-h-[22rem] w-full flex-col rounded-3xl bg-black/70
+              flex min-h-[22rem] w-full flex-col
+              rounded-3xl bg-black/70
               sm:min-h-[26rem]
-              lg:h-full lg:min-h-0 lg:w-[50%]
+              lg:h-full lg:min-h-0
             "
           >
-            <div className="flex min-h-0 w-full flex-1 flex-col items-center gap-5 p-4 sm:gap-6 sm:p-5 lg:gap-8 lg:p-4 overflow-y-scroll">
+            <div
+              className="
+                flex min-h-0 w-full flex-1 flex-col lg:h-full
+                items-center gap-5 overflow-hidden
+                p-4 sm:gap-6 sm:p-5 lg:gap-8 lg:p-4
+              "
+            >
+              {/* Título fixo */}
               <div className="shrink-0 border-b-2 border-primary px-2 pb-1 text-center">
                 <h2 className="font-cormorant text-base uppercase text-primary-light">
                   Recados recebidos
                 </h2>
               </div>
 
-              <div className="flex min-h-0 w-full flex-1 flex-col gap-3 overflow-y-auto rounded-2xl sm:gap-4 lg:rounded-3xl">
-                <Suspense
-                  fallback={
-                    <p className="text-sm text-primary-light font-lora">
-                      Carregando recados...
-                    </p>
-                  }
-                >
+              {/* Scroll independente */}
+              <div
+                className="
+                  max-h-[60svh] min-h-0 w-full overflow-x-hidden overflow-y-auto
+                  overscroll-y-contain rounded-2xl
+                  lg:h-0 lg:max-h-none lg:flex-1 lg:rounded-3xl
+                "
+              >
+                <div className="flex w-full flex-col gap-3 sm:gap-4">
                   {messages && messages.length > 0 ? (
                     messages.map((message) => (
                       <LiquidGlassWrapper
@@ -208,7 +226,7 @@ export function Recado() {
                       Nenhum recado recebido ainda.
                     </p>
                   )}
-                </Suspense>
+                </div>
               </div>
             </div>
           </LiquidGlassWrapper>

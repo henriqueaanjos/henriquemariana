@@ -3,6 +3,7 @@ import { db } from "@/src/prisma/db";
 import { requireAdminSession } from "@/src/services/admin-auth";
 import { Char } from "@prisma/orm-postgres/target/codec-types";
 import { NextResponse } from "next/server";
+import { isAgeGroup } from "@/src/libs/age-group";
 
 const VALID_STATUSES = [
   "PENDING",
@@ -75,6 +76,10 @@ export async function PATCH(
       name?: string;
       phone?: string | null;
       status?: RSVPStatus;
+      ageGroup?:
+        | "ADULT"
+        | "CHILD_4_7"
+        | "CHILD_UNDER_4";
     } = {};
 
     if (body.name !== undefined) {
@@ -123,6 +128,17 @@ export async function PATCH(
       }
 
       data.status = body.status as RSVPStatus;
+    }
+
+    if (body.ageGroup !== undefined) {
+      if (!isAgeGroup(body.ageGroup)) {
+        return NextResponse.json(
+          { error: "Classificação por idade inválida." },
+          { status: 400 },
+        );
+      }
+
+      data.ageGroup = body.ageGroup;
     }
 
     if (Object.keys(data).length === 0) {

@@ -1,4 +1,5 @@
 import axios from "axios";
+import type { AgeGroup } from "@/src/libs/age-group";
 
 export type RSVPGuestStatus =
     | "confirmed"
@@ -11,6 +12,7 @@ export interface AdminRSVPFamilyGuest {
     name: string;
     phone?: string | null;
     status: RSVPGuestStatus;
+    ageGroup: AgeGroup;
     createdAt: string;
     updatedAt: string;
 }
@@ -30,6 +32,7 @@ interface ApiFamilyMember {
     name: string;
     phone?: string | null;
     status: "PENDING" | "CONFIRMED" | "DECLINED";
+    ageGroup: "ADULT" | "CHILD_4_7" | "CHILD_UNDER_4";
     createdAt: string;
     updatedAt: string;
 }
@@ -79,6 +82,7 @@ export async function getAdminRSVPFamily(
             name: member.name,
             phone: member.phone ?? null,
             status: normalizeStatus(member.status),
+            ageGroup: member.ageGroup,
             createdAt: member.createdAt,
             updatedAt: member.updatedAt,
         })),
@@ -86,19 +90,21 @@ export async function getAdminRSVPFamily(
 }
 
 export async function createAdminRSVPFamilyMember(
-  familyId: string,
-  name: string,
-  phone?: string,
+    familyId: string,
+    name: string,
+    phone?: string,
+    ageGroup: AgeGroup = "ADULT",
 ) {
-  const { data } = await axios.post(
-    `/api/admin/families/${familyId}/members`,
-    {
-      name,
-      phone: phone || null,
-    },
-  );
+    const { data } = await axios.post(
+        `/api/admin/families/${familyId}/members`,
+        {
+            name,
+            phone: phone || null,
+            ageGroup,
+        },
+    );
 
-  return data;
+    return data;
 }
 
 export async function updateAdminRSVPFamily(
@@ -116,9 +122,10 @@ export async function updateAdminRSVPFamily(
 }
 
 export type UpdateAdminRSVPFamilyMemberPayload = {
-  name?: string;
-  phone?: string | null;
-  status?: RSVPGuestStatus;
+    name?: string;
+    phone?: string | null;
+    status?: RSVPGuestStatus;
+    ageGroup?: AgeGroup;
 };
 
 function toApiStatus(

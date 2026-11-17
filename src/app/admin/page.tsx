@@ -2,6 +2,7 @@
 
 import {
   ArrowRight,
+  Baby,
   Camera,
   Check,
   Clock,
@@ -12,6 +13,7 @@ import {
   TrendUp,
   UsersThree,
 } from "@phosphor-icons/react";
+
 import { motion } from "motion/react";
 import Link from "next/link";
 
@@ -165,6 +167,13 @@ export default function AdminPage() {
       href: "/admin/rsvp",
     },
     {
+      label: "Crianças",
+      value: data?.stats.children ?? 0,
+      detail: `${data?.stats.childrenUnder4 ?? 0} com < 4 anos`,
+      icon: Baby,
+      href: "/admin/rsvp",
+    },
+    {
       label: "Confirmados",
       value: data?.stats.confirmed ?? 0,
       detail: `${data?.stats.guests
@@ -254,8 +263,8 @@ export default function AdminPage() {
         <div className="space-y-6">
           <div className="h-56 animate-pulse rounded-[28px] bg-[#2c2925]/5" />
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, index) => (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
+            {Array.from({ length: 5 }).map((_, index) => (
               <div
                 key={index}
                 className="h-36 animate-pulse rounded-2xl bg-[#2c2925]/5"
@@ -312,14 +321,14 @@ export default function AdminPage() {
       </section>
 
       {/* Stats */}
-      <section className="mb-10 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5 mb-4">
         {stats.map((stat, index) => (
           <StatCard key={stat.label} stat={stat} index={index} />
         ))}
       </section>
 
       {/* RSVP + Activity */}
-      <section className="mb-10 grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
+      <section className="mb-10 grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)]">
         {/* RSVP */}
         <div className="rounded-3xl border border-[#2c2925]/7 bg-white/45 p-6 sm:p-7">
           <SectionHeading
@@ -328,7 +337,7 @@ export default function AdminPage() {
             href="/admin/rsvp"
           />
 
-          <div className="grid gap-8 sm:grid-cols-[180px_1fr] sm:items-center">
+          <div className="grid gap-8 sm:grid-cols-[180px_1fr] sm:items-center lg:grid-cols-1 lg:items-start xl:grid-cols-[180px_1fr] xl:items-center">
             <div className="relative mx-auto flex h-40 w-40 items-center justify-center">
               <svg
                 className="absolute inset-0 h-full w-full -rotate-90"
@@ -425,7 +434,7 @@ export default function AdminPage() {
           <div className="divide-y divide-[#2c2925]/7">
             {activities.map((activity) => (
               <div
-                key={`${activity.time}-${activity.title}`}
+                key={`${activity.time}-${activity.title}-${activity.createdAt}`}
                 className="flex gap-4 py-4 first:pt-0 last:pb-0"
               >
                 <span className="w-10 shrink-0 pt-0.5 text-[10px] font-medium text-[#2c2925]/30">
@@ -448,7 +457,7 @@ export default function AdminPage() {
       </section>
 
       {/* Photos + Playlist */}
-      <section className="mb-10 grid gap-6 lg:grid-cols-[1.35fr_0.65fr]">
+      <section className="mb-10 grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,0.65fr)]">
         {/* Photos */}
         <div className="rounded-3xl border border-[#2c2925]/7 bg-white/45 p-6 sm:p-7">
           <SectionHeading
@@ -547,7 +556,7 @@ export default function AdminPage() {
       </section>
 
       {/* Messages + Milestone */}
-      <section className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
+      <section className="grid gap-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
         {/* Milestone */}
         <div className="relative overflow-hidden rounded-3xl bg-[#d9b982] p-7 sm:p-8">
           <Heart

@@ -33,7 +33,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'6dc27314663f8c2af081974357b7359efc7df53878f15383a879fa97501e4acd'>;
+  StorageHashBase<'1f50517a7e7b3b3b34a0f8a43bab89e36d94d2de1e962333ab801943196e003f'>;
 export type ExecutionHash =
   ExecutionHashBase<'135810afa82370f9b7186e627121579f11ed4b9ebf5eed28d50696e1b7b5f6a1'>;
 export type ProfileHash =
@@ -254,6 +254,7 @@ export type FieldOutputTypes = {
       readonly name: CodecTypes['pg/text@1']['output'];
       readonly phone: CodecTypes['pg/text@1']['output'] | null;
       readonly status: 'PENDING' | 'CONFIRMED' | 'DECLINED';
+      readonly ageGroup: 'ADULT' | 'CHILD_4_7' | 'CHILD_UNDER_4';
       readonly checkedInAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
@@ -304,6 +305,7 @@ export type FieldInputTypes = {
       readonly name: CodecTypes['pg/text@1']['input'];
       readonly phone: CodecTypes['pg/text@1']['input'] | null;
       readonly status: 'PENDING' | 'CONFIRMED' | 'DECLINED';
+      readonly ageGroup: 'ADULT' | 'CHILD_4_7' | 'CHILD_UNDER_4';
       readonly checkedInAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
@@ -349,6 +351,7 @@ export type StorageColumnTypes = {
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
     };
     readonly FamilyMember: {
+      readonly ageGroup: 'ADULT' | 'CHILD_4_7' | 'CHILD_UNDER_4';
       readonly checkedInAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly familyId: Char<36>;
@@ -399,6 +402,7 @@ export type StorageColumnInputTypes = {
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
     readonly FamilyMember: {
+      readonly ageGroup: 'ADULT' | 'CHILD_4_7' | 'CHILD_UNDER_4';
       readonly checkedInAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly familyId: CodecTypes['sql/char@1']['input'];
@@ -525,11 +529,19 @@ type ContractBase = Omit<
                     readonly value: DefaultLiteralValue<'pg/text@1', 'PENDING'>;
                   };
                 };
+                readonly ageGroup: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'ADULT'>;
+                  };
+                };
                 readonly checkedInAt: {
                   readonly nativeType: 'timestamptz';
                   readonly codecId: 'pg/timestamptz-string@1';
                   readonly nullable: true;
-                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
                 };
                 readonly createdAt: {
                   readonly nativeType: 'timestamptz';
@@ -720,6 +732,10 @@ type ContractBase = Omit<
             };
           };
           readonly valueSet: {
+            readonly AgeGroup: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['ADULT', 'CHILD_4_7', 'CHILD_UNDER_4'];
+            };
             readonly RSVPStatus: {
               readonly kind: 'valueSet';
               readonly values: readonly ['PENDING', 'CONFIRMED', 'DECLINED'];
@@ -836,6 +852,10 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly ageGroup: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly checkedInAt: {
                 readonly nullable: true;
                 readonly type: {
@@ -880,6 +900,7 @@ type ContractBase = Omit<
                 readonly name: { readonly column: 'name' };
                 readonly phone: { readonly column: 'phone' };
                 readonly status: { readonly column: 'status' };
+                readonly ageGroup: { readonly column: 'ageGroup' };
                 readonly checkedInAt: { readonly column: 'checkedInAt' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
@@ -1072,6 +1093,14 @@ type ContractBase = Omit<
               { readonly name: 'PENDING'; readonly value: 'PENDING' },
               { readonly name: 'CONFIRMED'; readonly value: 'CONFIRMED' },
               { readonly name: 'DECLINED'; readonly value: 'DECLINED' },
+            ];
+          };
+          readonly AgeGroup: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'ADULT'; readonly value: 'ADULT' },
+              { readonly name: 'CHILD_4_7'; readonly value: 'CHILD_4_7' },
+              { readonly name: 'CHILD_UNDER_4'; readonly value: 'CHILD_UNDER_4' },
             ];
           };
         };

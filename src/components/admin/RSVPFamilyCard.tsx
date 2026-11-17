@@ -11,6 +11,11 @@ import {
 } from "@phosphor-icons/react";
 import { motion } from "motion/react";
 
+import {
+  getAgeGroupLabel,
+  type AgeGroup,
+} from "@/src/libs/age-group";
+
 export type RSVPGuestStatus =
   | "confirmed"
   | "pending"
@@ -20,6 +25,7 @@ export interface RSVPGuest {
   id: string;
   name: string;
   status: RSVPGuestStatus;
+   ageGroup: AgeGroup;
   checkedInAt: string | null;
 }
 
@@ -207,9 +213,20 @@ export function RSVPFamilyCard({
                 </span>
 
                 <div className="flex min-w-0 flex-col">
-                  <span className="truncate text-[11px] font-medium text-[#2c2925]/75">
-                    {guest.name}
-                  </span>
+                   <div className="flex min-w-0 items-center gap-1.5">
+                    <span className="truncate text-[11px] font-medium text-[#2c2925]/75">
+                      {guest.name}
+                    </span>
+
+                    {guest.ageGroup !== "ADULT" && (
+                      <span className="shrink-0 rounded-full bg-[#6e4c12]/8 px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wider text-[#6e4c12]">
+                        {getAgeGroupLabel(
+                          guest.ageGroup,
+                          true,
+                        )}
+                      </span>
+                    )}
+                  </div>
 
                   {guest.status === "confirmed" &&
                     guest.checkedInAt && (

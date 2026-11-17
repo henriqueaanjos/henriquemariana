@@ -5,11 +5,20 @@ import { X } from "@phosphor-icons/react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 
+import {
+  AGE_GROUP_OPTIONS,
+  type AgeGroup,
+} from "@/src/libs/age-group";
+
 interface AddGuestModalProps {
   open: boolean;
   isLoading?: boolean;
   onClose: () => void;
-  onSubmit: (name: string, phone: string) => void;
+  onSubmit: (
+    name: string,
+    phone: string,
+    ageGroup: AgeGroup,
+  ) => void;
 }
 
 function formatPhone(value: string) {
@@ -34,11 +43,14 @@ export function AddGuestModal({
 }: AddGuestModalProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [ageGroup, setAgeGroup] =
+    useState<AgeGroup>("ADULT");
 
   useEffect(() => {
     if (!open) {
       setName("");
       setPhone("");
+      setAgeGroup("ADULT");
     }
   }, [open]);
 
@@ -49,7 +61,11 @@ export function AddGuestModal({
 
     if (!trimmedName || isLoading) return;
 
-    onSubmit(trimmedName, phone.replace(/\D/g, ""));
+    onSubmit(
+      trimmedName,
+      phone.replace(/\D/g, ""),
+      ageGroup,
+    );
   }
 
   return (
@@ -153,6 +169,36 @@ export function AddGuestModal({
                   <p className="mt-2 text-[11px] text-[#2c2925]/40">
                     Informe o número com DDD para enviar o convite individual.
                   </p>
+                </div>
+
+                <div className="mt-5">
+                  <span className="mb-2 block text-[10px] font-medium uppercase tracking-[0.12em] text-[#2c2925]/45">
+                    Classificação por idade
+                  </span>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    {AGE_GROUP_OPTIONS.map((option) => {
+                      const selected =
+                        ageGroup === option.value;
+
+                      return (
+                        <button
+                          key={option.value}
+                          type="button"
+                          disabled={isLoading}
+                          onClick={() =>
+                            setAgeGroup(option.value)
+                          }
+                          className={`h-11 rounded-xl border px-2 text-[11px] font-medium transition-all ${selected
+                              ? "border-[#6e4c12]/30 bg-[#6e4c12]/8 text-[#6e4c12]"
+                              : "border-[#2c2925]/8 bg-white/70 text-[#2c2925]/55 hover:bg-white"
+                            } disabled:opacity-50`}
+                        >
+                          {option.shortLabel}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 <div className="mt-6 flex items-center justify-end gap-3">

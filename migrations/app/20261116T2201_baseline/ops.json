@@ -1,0 +1,379 @@
+[
+  {
+    "id": "schema.public",
+    "label": "Create schema \"public\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres"
+    },
+    "precheck": [],
+    "execute": [
+      {
+        "description": "Create schema \"public\"",
+        "sql": "CREATE SCHEMA IF NOT EXISTS \"public\"",
+        "params": []
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "table.Family",
+    "label": "Create table \"Family\"",
+    "summary": "Creates table \"Family\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Family"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Family\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Family\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Family\"",
+        "sql": "CREATE TABLE \"public\".\"Family\" (\n  \"code\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" character(36) NOT NULL,\n  \"name\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Family\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Family\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.FamilyMember",
+    "label": "Create table \"FamilyMember\"",
+    "summary": "Creates table \"FamilyMember\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "FamilyMember"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"FamilyMember\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"FamilyMember\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"FamilyMember\"",
+        "sql": "CREATE TABLE \"public\".\"FamilyMember\" (\n  \"checkedInAt\" timestamptz DEFAULT (now()),\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"familyId\" character(36) NOT NULL,\n  \"id\" character(36) NOT NULL,\n  \"name\" text NOT NULL,\n  \"phone\" text,\n  \"status\" text DEFAULT 'PENDING' NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"FamilyMember_status_check_3fd4c98a\" CHECK (\"status\" IN ('PENDING', 'CONFIRMED', 'DECLINED'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"FamilyMember\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"FamilyMember\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.Message",
+    "label": "Create table \"Message\"",
+    "summary": "Creates table \"Message\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Message"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Message\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Message\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Message\"",
+        "sql": "CREATE TABLE \"public\".\"Message\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" character(36) NOT NULL,\n  \"message\" text NOT NULL,\n  \"name\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Message\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Message\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.Photo",
+    "label": "Create table \"Photo\"",
+    "summary": "Creates table \"Photo\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Photo"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Photo\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Photo\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Photo\"",
+        "sql": "CREATE TABLE \"public\".\"Photo\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" character(36) NOT NULL,\n  \"name\" text NOT NULL,\n  \"storageKey\" text,\n  \"updatedAt\" timestamptz NOT NULL,\n  \"url\" text NOT NULL,\n  \"userName\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Photo\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Photo\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.Songs",
+    "label": "Create table \"Songs\"",
+    "summary": "Creates table \"Songs\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Songs"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Songs\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Songs\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Songs\"",
+        "sql": "CREATE TABLE \"public\".\"Songs\" (\n  \"album\" text,\n  \"artist\" text NOT NULL,\n  \"artworkUrl\" text,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" character(36) NOT NULL,\n  \"itunesUrl\" text,\n  \"likes\" int4 DEFAULT 0 NOT NULL,\n  \"previewUrl\" text,\n  \"title\" text NOT NULL,\n  \"trackId\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Songs\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Songs\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.Family.Family_code_key",
+    "label": "Add unique constraint on \"Family\" (code)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "Family_code_key",
+        "table": "Family"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"Family_code_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Family_code_key",
+          "public",
+          "\"public\".\"Family\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"Family_code_key\"",
+        "sql": "ALTER TABLE \"public\".\"Family\" ADD CONSTRAINT \"Family_code_key\" UNIQUE (\"code\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"Family_code_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Family_code_key",
+          "public",
+          "\"public\".\"Family\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.Songs.Songs_trackId_key",
+    "label": "Add unique constraint on \"Songs\" (trackId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "Songs_trackId_key",
+        "table": "Songs"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"Songs_trackId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Songs_trackId_key",
+          "public",
+          "\"public\".\"Songs\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"Songs_trackId_key\"",
+        "sql": "ALTER TABLE \"public\".\"Songs\" ADD CONSTRAINT \"Songs_trackId_key\" UNIQUE (\"trackId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"Songs_trackId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Songs_trackId_key",
+          "public",
+          "\"public\".\"Songs\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.FamilyMember.FamilyMember_familyId_idx_3d03045e",
+    "label": "Create index \"FamilyMember_familyId_idx_3d03045e\" on \"FamilyMember\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "FamilyMember_familyId_idx_3d03045e",
+        "table": "FamilyMember"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"FamilyMember_familyId_idx_3d03045e\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"FamilyMember_familyId_idx_3d03045e\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"FamilyMember_familyId_idx_3d03045e\"",
+        "sql": "CREATE INDEX \"FamilyMember_familyId_idx_3d03045e\" ON \"public\".\"FamilyMember\" (\"familyId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"FamilyMember_familyId_idx_3d03045e\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"FamilyMember_familyId_idx_3d03045e\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.FamilyMember.FamilyMember_familyId_fkey",
+    "label": "Add foreign key \"FamilyMember_familyId_fkey\" on \"FamilyMember\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "FamilyMember_familyId_fkey",
+        "table": "FamilyMember"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"FamilyMember_familyId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "FamilyMember_familyId_fkey",
+          "public",
+          "\"public\".\"FamilyMember\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"FamilyMember_familyId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"FamilyMember\"\nADD CONSTRAINT \"FamilyMember_familyId_fkey\"\nFOREIGN KEY (\"familyId\")\nREFERENCES \"public\".\"Family\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"FamilyMember_familyId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "FamilyMember_familyId_fkey",
+          "public",
+          "\"public\".\"FamilyMember\""
+        ]
+      }
+    ]
+  }
+]
