@@ -34,13 +34,16 @@ export const metadata: Metadata = {
     title: "Henrique & Mariana",
     description: "Henrique & Mariana 2027",
   },
+  appleWebApp: {
+    statusBarStyle: "black-translucent",
+  },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  viewportFit: "cover",
-  themeColor: "#D9B982",
+  viewportFit: "cover",        // já existe — manter
+  themeColor: "#FAFAF8",       // era #D9B982; casa com --background
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

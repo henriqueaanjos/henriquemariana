@@ -1,14 +1,18 @@
-import { put } from "@vercel/blob";
+import { head, BlobNotFoundError } from "@vercel/blob";
 import { db } from "@/src/prisma/db";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-const ALLOWED_TYPES = [
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-];
+import {
+    PHOTO_ALLOWED_TYPES,
+    PHOTO_MAX_FILE_SIZE,
+    PHOTO_STORAGE_PREFIX,
+} from "@/src/libs/photos";
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
+type RegisterPhotoBody = {
+    name?: unknown;
+    fileName?: unknown;
+    storageKey?: unknown;
+};
 
 export async function GET() {
     try {
@@ -33,115 +37,84 @@ export async function GET() {
     }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
     try {
-        const formData = await request.formData();
+        const body = (await request.json()) as RegisterPhotoBody;
 
-        const username = formData.get("name");
-        const files = formData.getAll("files");
+        const name =
+            typeof body.name === "string" ? body.name.trim() : "";
+        const fileName =
+            typeof body.fileName === "string"
+                ? body.fileName.trim()
+                : "";
+        const storageKey =
+            typeof body.storageKey === "string"
+                ? body.storageKey
+                : "";
+
+        if (name.length < 2 || name.length > 100) {
+            return NextResponse.json(
+                { error: "O nome é obrigatório." },
+                { status: 400 },
+            );
+        }
 
         if (
-            typeof username !== "string" ||
-            !username.trim()
+            !storageKey.startsWith(PHOTO_STORAGE_PREFIX) ||
+            !/^wedding\/[0-9a-f-]{36}\.[a-z0-9]+$/.test(storageKey)
         ) {
             return NextResponse.json(
-                {
-                    error: "O nome é obrigatório.",
-                },
-                {
-                    status: 400,
-                },
+                { error: "Chave de armazenamento inválida." },
+                { status: 400 },
             );
         }
 
-        const imageFiles = files.filter(
-            (file): file is File =>
-                file instanceof File,
-        );
-
-        if (imageFiles.length === 0) {
+        if (!fileName) {
             return NextResponse.json(
-                {
-                    error: "Selecione pelo menos uma foto.",
-                },
-                {
-                    status: 400,
-                },
+                { error: "Nome do arquivo inválido." },
+                { status: 400 },
             );
         }
 
-        for (const file of imageFiles) {
-            if (!ALLOWED_TYPES.includes(file.type)) {
-                return NextResponse.json(
-                    {
-                        error: `O arquivo "${file.name}" possui um formato inválido.`,
-                    },
-                    {
-                        status: 400,
-                    },
-                );
-            }
+        /*
+         * Confere no Blob que o arquivo existe e respeita as regras.
+         * A URL salva é a devolvida pelo head(), nunca a do cliente.
+         */
+        const blob = await head(storageKey);
 
-            if (file.size > MAX_FILE_SIZE) {
-                return NextResponse.json(
-                    {
-                        error: `O arquivo "${file.name}" excede o limite de 10 MB.`,
-                    },
-                    {
-                        status: 400,
-                    },
-                );
-            }
+        if (
+            blob.size > PHOTO_MAX_FILE_SIZE ||
+            !(PHOTO_ALLOWED_TYPES as readonly string[]).includes(
+                blob.contentType,
+            )
+        ) {
+            return NextResponse.json(
+                { error: "Upload inválido." },
+                { status: 400 },
+            );
         }
 
-        const images = await Promise.all(
-            imageFiles.map(async (file) => {
-                const extension =
-                    file.name
-                        .split(".")
-                        .pop()
-                        ?.toLowerCase() ?? "jpg";
-
-                const storageKey =
-                    `wedding/${crypto.randomUUID()}.${extension}`;
-
-                const blob = await put(
-                    storageKey,
-                    file,
-                    {
-                        access: "public",
-                        addRandomSuffix: false,
-                    },
-                );
-
-                const image =
-                    await db.orm.public.Photo.create({
-                        userName: username.trim(),
-                        name: file.name,
-                        url: blob.url,
-                        storageKey,
-                    });
-
-                return image;
-            }),
-        );
-
-        return NextResponse.json(images, {
-            status: 201,
+        const image = await db.orm.public.Photo.create({
+            userName: name,
+            name: fileName,
+            url: blob.url,
+            storageKey: blob.pathname,
         });
+
+        return NextResponse.json([image], { status: 201 });
     } catch (error) {
-        console.error(
-            "Erro ao fazer upload das imagens:",
-            error,
-        );
+        if (error instanceof BlobNotFoundError) {
+            return NextResponse.json(
+                { error: "Arquivo não encontrado no armazenamento." },
+                { status: 400 },
+            );
+        }
+
+        console.error("Erro ao registrar imagem:", error);
 
         return NextResponse.json(
-            {
-                error: "Não foi possível enviar as imagens.",
-            },
-            {
-                status: 500,
-            },
+            { error: "Não foi possível registrar a imagem." },
+            { status: 500 },
         );
     }
 }

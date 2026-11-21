@@ -27,26 +27,3 @@ export async function deleteAdminPhoto(
 
   return data;
 }
-
-export async function uploadAdminPhotos({
-  name,
-  files,
-}: {
-  name: string;
-  files: File[];
-}) {
-  const formData = new FormData();
-
-  formData.append("name", name);
-
-  files.forEach((file) => {
-    formData.append("files", file);
-  });
-
-  const { data } = await axios.post<AdminPhoto[]>(
-    "/api/photos",
-    formData,
-  );
-
-  return data;
-}

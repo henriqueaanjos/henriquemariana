@@ -1,24 +1,23 @@
 "use client";
 
-import { DownloadSimple, Trash, UploadSimple, Warning } from "@phosphor-icons/react";
-import { useMemo, useState } from "react";
+import { CheckCircle, DownloadSimple, Trash, UploadSimple, Warning } from "@phosphor-icons/react";
+import { useEffect, useMemo, useState } from "react";
 
-const ALLOWED_TYPES = [
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-    "image/gif",
-    "image/tiff",
-    "image/heic",
-];
-
-const ALLOWED_EXTENSIONS = "JPG, PNG, WEBP, TIFF, HEIC ou GIF";
+import {
+    getPhotoKey,
+    PHOTO_ALLOWED_EXTENSIONS,
+    PHOTO_ALLOWED_TYPES,
+    PHOTO_MAX_FILE_SIZE,
+    PHOTO_MAX_FILES,
+} from "@/src/libs/photos";
 
 type DropzoneProps = {
     onFilesChange: (files: File[]) => void;
+    disabled?: boolean;
+    progressByFile?: Record<string, number>;
 };
 
-export function Dropzone({ onFilesChange }: DropzoneProps) {
+export function Dropzone({ onFilesChange, disabled = false, progressByFile }: DropzoneProps) {
     const [files, setFiles] = useState<File[]>([]);
     const [isDragging, setIsDragging] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -26,43 +25,83 @@ export function Dropzone({ onFilesChange }: DropzoneProps) {
     const previews = useMemo(() => {
         return files.map((file) => ({
             file,
+            key: getPhotoKey(file),
             url: URL.createObjectURL(file),
         }));
     }, [files]);
 
+    useEffect(() => {
+        return () => {
+            previews.forEach(({ url }) => URL.revokeObjectURL(url));
+        };
+    }, [previews]);
+
     function handleFiles(selectedFiles: FileList | null) {
-        if (!selectedFiles) return;
+        if (!selectedFiles || disabled) return;
 
         const newFiles = Array.from(selectedFiles);
+        const messages: string[] = [];
 
-        const validFiles = newFiles.filter((file) =>
-            ALLOWED_TYPES.includes(file.type)
+        const invalidType = newFiles.filter(
+            (file) =>
+                !(PHOTO_ALLOWED_TYPES as readonly string[]).includes(
+                    file.type,
+                ),
         );
 
-        const invalidFiles = newFiles.filter(
-            (file) => !ALLOWED_TYPES.includes(file.type)
-        );
-
-        if (invalidFiles.length > 0) {
-            setError(
-                invalidFiles.length === 1
+        if (invalidType.length > 0) {
+            messages.push(
+                invalidType.length === 1
                     ? "Esse arquivo não é um formato permitido."
-                    : `${invalidFiles.length} arquivos não são formatos permitidos.`
+                    : `${invalidType.length} arquivos não são formatos permitidos.`,
             );
+        }
 
-            setTimeout(() => {
-                setError(null);
-            }, 4000);
+        const tooLarge = newFiles.filter(
+            (file) => file.size > PHOTO_MAX_FILE_SIZE,
+        );
+
+        if (tooLarge.length > 0) {
+            messages.push(
+                `${tooLarge.length} ${
+                    tooLarge.length === 1
+                        ? "foto excede"
+                        : "fotos excedem"
+                } o limite de 10 MB.`,
+            );
+        }
+
+        const validFiles = newFiles.filter(
+            (file) =>
+                (PHOTO_ALLOWED_TYPES as readonly string[]).includes(
+                    file.type,
+                ) && file.size <= PHOTO_MAX_FILE_SIZE,
+        );
+
+        if (messages.length > 0) {
+            setError(messages.join(" "));
+            setTimeout(() => setError(null), 5000);
         }
 
         if (validFiles.length === 0) return;
 
-        setFiles((current) => [
-            ...current,
-            ...validFiles,
-        ]);
+        const merged = new Map(
+            files.map((file) => [getPhotoKey(file), file]),
+        );
 
-        onFilesChange([...files, ...validFiles]);
+        validFiles.forEach((file) => {
+            merged.set(getPhotoKey(file), file);
+        });
+
+        const next = [...merged.values()];
+
+        if (next.length > PHOTO_MAX_FILES) {
+            setError(`Máximo de ${PHOTO_MAX_FILES} fotos por envio.`);
+            return;
+        }
+
+        setFiles(next);
+        onFilesChange(next);
     }
 
     function handleDrop(
@@ -83,11 +122,12 @@ export function Dropzone({ onFilesChange }: DropzoneProps) {
     }
 
     function removeFile(index: number) {
-        setFiles((current) =>
-            current.filter(
-                (_, fileIndex) => fileIndex !== index
-            )
+        const next = files.filter(
+            (_, fileIndex) => fileIndex !== index,
         );
+
+        setFiles(next);
+        onFilesChange(next);
     }
 
     return (
@@ -109,6 +149,7 @@ export function Dropzone({ onFilesChange }: DropzoneProps) {
                         ? "border-primary bg-primary-light"
                         : "border-primary"
                     }
+                    ${disabled ? "pointer-events-none opacity-60" : ""}
                 `}
             >
 
@@ -160,13 +201,14 @@ export function Dropzone({ onFilesChange }: DropzoneProps) {
                         `}
                     >
                         (Formatos permitidos:{" "}
-                        {ALLOWED_EXTENSIONS})
+                        {PHOTO_ALLOWED_EXTENSIONS})
                     </p>
 
                     <input
                         type="file"
-                        accept={ALLOWED_TYPES.join(",")}
+                        accept={PHOTO_ALLOWED_TYPES.join(",")}
                         multiple
+                        disabled={disabled}
                         className="hidden"
                         onChange={handleChange}
                     />
@@ -198,7 +240,7 @@ export function Dropzone({ onFilesChange }: DropzoneProps) {
 
                     <div className="flex w-full flex-row flex-wrap gap-2">
                         {previews.map(
-                            ({ file, url }, index) => (
+                            ({ file, url, key }, index) => (
                                 <div
                                     key={`${file.name}-${index}`}
                                     className="
@@ -220,44 +262,98 @@ export function Dropzone({ onFilesChange }: DropzoneProps) {
                                         "
                                     />
 
-                                    <div
-                                        className="
-                                            absolute inset-0
-                                            flex items-center
-                                            justify-center
-                                            bg-black/50
-                                            opacity-0
-                                            transition-opacity
-                                            duration-200
-                                            group-hover:opacity-100
-                                        "
-                                    >
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                removeFile(index)
-                                            }
-                                            className="
-                                                flex h-8 w-8
-                                                cursor-pointer
-                                                items-center
-                                                justify-center
-                                                rounded-full
-                                                bg-black/60
-                                                text-white
-                                                transition-all
-                                                duration-200
-                                                hover:scale-110
-                                                hover:bg-red-500
-                                            "
-                                            aria-label={`Remover ${file.name}`}
-                                        >
-                                            <Trash
-                                                size={18}
-                                                weight="bold"
+                                     {progressByFile?.[key] !== undefined &&
+                                    progressByFile[key] < 100 ? (
+                                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/60">
+                                            <svg
+                                                viewBox="0 0 36 36"
+                                                className="h-8 w-8 -rotate-90"
+                                            >
+                                                <circle
+                                                    cx="18"
+                                                    cy="18"
+                                                    r="15"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    strokeWidth="3"
+                                                    className="text-white/25"
+                                                />
+                                                <circle
+                                                    cx="18"
+                                                    cy="18"
+                                                    r="15"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    strokeWidth="3"
+                                                    strokeLinecap="round"
+                                                    strokeDasharray={
+                                                        2 * Math.PI * 15
+                                                    }
+                                                    strokeDashoffset={
+                                                        2 * Math.PI * 15 *
+                                                        (1 -
+                                                            progressByFile[key] /
+                                                                100)
+                                                    }
+                                                    className="text-primary-light transition-[stroke-dashoffset] duration-200"
+                                                />
+                                            </svg>
+                                            <span className="text-[9px] text-white">
+                                                {Math.round(
+                                                    progressByFile[key],
+                                                )}
+                                                %
+                                            </span>
+                                        </div>
+                                    ) : progressByFile?.[key] === 100 ? (
+                                        <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                                            <CheckCircle
+                                                size={26}
+                                                weight="fill"
+                                                className="text-green-300"
                                             />
-                                        </button>
-                                    </div>
+                                        </div>
+                                    ) : (
+                                        <div
+                                            className="
+                                                absolute inset-0
+                                                flex items-center
+                                                justify-center
+                                                bg-black/50
+                                                opacity-0
+                                                transition-opacity
+                                                duration-200
+                                                group-hover:opacity-100
+                                            "
+                                        >
+                                            <button
+                                                type="button"
+                                                disabled={disabled}
+                                                onClick={() =>
+                                                    removeFile(index)
+                                                }
+                                                className="
+                                                    flex h-8 w-8
+                                                    cursor-pointer
+                                                    items-center
+                                                    justify-center
+                                                    rounded-full
+                                                    bg-black/60
+                                                    text-white
+                                                    transition-all
+                                                    duration-200
+                                                    hover:scale-110
+                                                    hover:bg-red-500
+                                                "
+                                                aria-label={`Remover ${file.name}`}
+                                            >
+                                                <Trash
+                                                    size={18}
+                                                    weight="bold"
+                                                />
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             )
                         )}
