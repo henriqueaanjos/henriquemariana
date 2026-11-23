@@ -107,8 +107,5 @@ export async function uploadImages(
 
 export async function getStaticPhotos(): Promise<StaticPhoto[]> {
     const response = await api.get<StaticPhoto[]>("/api/staticPhotos");
-
-    console.log("Static photos response:", response.data);
-
     return response.data;
 }

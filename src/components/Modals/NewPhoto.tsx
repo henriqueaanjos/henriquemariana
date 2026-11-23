@@ -60,7 +60,7 @@ export function NewPhotoModal({ isOpen, onClose }: NewPhotoModalProps) {
 
         onSuccess() {
             queryClient.invalidateQueries({
-                queryKey: ["images"],
+                queryKey: ["photos"],
             });
 
             reset();
@@ -104,8 +104,16 @@ export function NewPhotoModal({ isOpen, onClose }: NewPhotoModalProps) {
     }
 
     return (
-         <Modal isOpen={isOpen} onClose={() => { if (!isPending) onClose(); }}>
-            <div className="w-full h-full cursor-default flex flex-col gap-8 overflow-y">
+         <Modal isOpen={isOpen} onClose={() => {
+             if (!isPending) {
+                 reset();
+                 setFiles([]);
+                 setProgress(null);
+                 setUploadError(null);
+                 onClose();
+             }
+         }}>
+            <div className="flex h-full min-h-0 w-full cursor-default flex-col gap-6 sm:gap-8">
                 <div className="w-full flex flex-col items-center">
                     <div className="border-b-2 border-primary pb-1 px-2 text-center">
                         <h1 className="text-base text-primary-light uppercase font-cormorant">Envie suas fotos</h1>

@@ -1,4 +1,8 @@
+"use client";
+
 import { CameraSlashIcon } from "@phosphor-icons/react";
+import { useState } from "react";
+
 import { Loading } from "./Loading";
 
 type AlbumCoverProps = {
@@ -6,6 +10,42 @@ type AlbumCoverProps = {
     photos: string[];
     emphasis?: boolean;
     isLoading?: boolean;
+}
+
+function CoverImage({
+    src,
+    alt,
+    className,
+}: {
+    src: string;
+    alt: string;
+    className: string;
+}) {
+    const [status, setStatus] = useState<"loading" | "loaded" | "error">("loading");
+
+    return (
+        <>
+            {status === "loading" && (
+                <div className="absolute inset-0 animate-pulse bg-primary-light" />
+            )}
+
+            {status === "error" ? (
+                <div className="absolute inset-0 flex items-center justify-center text-primary-dark/40">
+                    <CameraSlashIcon size={32} />
+                </div>
+            ) : (
+                <img
+                    src={src}
+                    alt={alt}
+                    onLoad={() => setStatus("loaded")}
+                    onError={() => setStatus("error")}
+                    className={`${className} transition-all duration-700 ${
+                        status === "loaded" ? "opacity-100" : "opacity-0"
+                    }`}
+                />
+            )}
+        </>
+    );
 }
 
 export function AlbumsCover({ title, photos, emphasis = false, isLoading = false }: AlbumCoverProps) {
@@ -30,7 +70,8 @@ export function AlbumsCover({ title, photos, emphasis = false, isLoading = false
                         group-hover:translate-x-2
                     "
                 >
-                    <img
+                    <CoverImage
+                        key={photos[2]}
                         src={photos[2]}
                         alt=""
                         className="h-full w-full object-cover"
@@ -57,7 +98,8 @@ export function AlbumsCover({ title, photos, emphasis = false, isLoading = false
                         group-hover:-rotate-6
                     "
                 >
-                    <img
+                    <CoverImage
+                        key={photos[1]}
                         src={photos[1]}
                         alt=""
                         className="h-full w-full object-cover"
@@ -82,26 +124,18 @@ export function AlbumsCover({ title, photos, emphasis = false, isLoading = false
                     ${emphasis ? "border-2 border-primary shadow-primary" : ""}
                 `}
             >
-                {photos.length > 0 ?
-                    <img
+                {photos.length > 0 ? (
+                    <CoverImage
+                        key={photos[0]}
                         src={photos[0]}
                         alt={title}
-                        className="
-                        h-full
-                        w-full
-                        object-cover
-                        transition-transform
-                        duration-700
-                        group-hover:scale-105
-                    "
+                        className="h-full w-full object-cover"
                     />
-                    :
-                    isLoading ? (
-                        <Loading />
-                    ) : (
-                        <CameraSlashIcon size={48} className="absolute top-1/2 left-1/2 -translate-1/2 opacity-40 text-primary-dark"/>
-                    )
-                }
+                ) : isLoading ? (
+                    <Loading />
+                ) : (
+                    <CameraSlashIcon size={48} className="absolute top-1/2 left-1/2 -translate-1/2 opacity-40 text-primary-dark" />
+                )}
 
                 {/* Gradiente */}
                 <div
@@ -120,15 +154,7 @@ export function AlbumsCover({ title, photos, emphasis = false, isLoading = false
                 />
 
                 {/* Informações */}
-                <div
-                    className="
-                        absolute
-                        bottom-0
-                        left-0
-                        p-5
-                        text-white
-                    "
-                >
+                <div className="absolute bottom-0 left-0 p-5 text-white">
                     <h2 className="text-xl font-bold capitalize font-lora text-primary-light">
                         {title}
                     </h2>

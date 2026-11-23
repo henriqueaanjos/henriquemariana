@@ -25,7 +25,7 @@ export function AdminShell({ children }: AdminShellProps) {
       />
 
       {/* Conteúdo principal */}
-      <div className="min-h-screen lg:pl-70">
+      <div className="min-h-screen lg:pl-72">
         {/* Barra superior mobile */}
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[#2c2925]/8 bg-[#f7f4ef]/90 px-5 backdrop-blur-xl lg:hidden">
           <button

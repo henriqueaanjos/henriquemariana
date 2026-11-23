@@ -1,14 +1,14 @@
-
 "use client";
 
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
+  WarningCircleIcon,
   XIcon,
 } from "@phosphor-icons/react";
 import { AnimatePresence, motion } from "motion/react";
 import { createPortal } from "react-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface PhotoLightboxProps {
   photos: string[];
@@ -41,11 +41,16 @@ export function PhotoLightbox({
   const isOpen = selectedIndex !== null;
   const [mounted, setMounted] = useState(false);
   const [direction, setDirection] = useState(1);
+  const [imageStatus, setImageStatus] = useState<"loading" | "loaded" | "error">("loading");
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
-  // Evita acessar document durante a renderização no servidor.
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    setImageStatus("loading");
+  }, [selectedIndex === null ? null : photos[selectedIndex]]);
 
   function handlePrevious() {
     if (selectedIndex === null || photos.length === 0) return;
@@ -69,11 +74,21 @@ export function PhotoLightbox({
     onChange(nextIndex);
   }
 
-  // Bloqueia a rolagem da página e controla os atalhos do teclado.
   useEffect(() => {
     if (!isOpen) return;
 
+    const originalOverflow = document.body.style.overflow;
+
     document.body.style.overflow = "hidden";
+    closeButtonRef.current?.focus();
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
@@ -95,11 +110,9 @@ export function PhotoLightbox({
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "";
     };
   }, [isOpen, selectedIndex, photos.length, onClose, onChange]);
 
-  // O portal tira o lightbox das camadas de posicionamento da galeria.
   if (!mounted) return null;
 
   return createPortal(
@@ -137,6 +150,7 @@ export function PhotoLightbox({
 
           {/* Botão fechar */}
           <button
+            ref={closeButtonRef}
             type="button"
             onClick={(event) => {
               event.stopPropagation();
@@ -176,20 +190,31 @@ export function PhotoLightbox({
                   opacity: { duration: 0.2 },
                   x: { duration: 0.25 },
                 }}
-                className="
-                  absolute inset-0
-                  flex items-center justify-center
-                "
+                className="absolute inset-0 flex items-center justify-center"
               >
-                <img
-                  src={photos[selectedIndex]}
-                  alt={`Foto ${selectedIndex + 1} de ${photos.length}`}
-                  className="
-                    max-h-full max-w-full
-                    select-none object-contain
-                  "
-                  draggable={false}
-                />
+                {imageStatus === "loading" && (
+                  <div className="absolute aspect-video w-full max-w-3xl animate-pulse rounded-xl bg-white/10" />
+                )}
+
+                {imageStatus === "error" ? (
+                  <div className="flex flex-col items-center gap-2 text-white/60">
+                    <WarningCircleIcon size={32} />
+                    <p className="font-lora text-xs">
+                      Não foi possível carregar esta foto.
+                    </p>
+                  </div>
+                ) : (
+                  <img
+                    src={photos[selectedIndex]}
+                    alt={`Foto ${selectedIndex + 1} de ${photos.length}`}
+                    onLoad={() => setImageStatus("loaded")}
+                    onError={() => setImageStatus("error")}
+                    className={`max-h-full max-w-full select-none object-contain transition-opacity duration-300 ${
+                      imageStatus === "loaded" ? "opacity-100" : "opacity-0"
+                    }`}
+                    draggable={false}
+                  />
+                )}
               </motion.div>
             </AnimatePresence>
 

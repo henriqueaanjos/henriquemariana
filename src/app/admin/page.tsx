@@ -43,13 +43,13 @@ function SectionHeading({
   href?: string;
 }) {
   return (
-    <div className="mb-5 flex items-end justify-between">
-      <div>
+    <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+      <div className="min-w-0">
         <p className="mb-1 text-[9px] font-semibold uppercase tracking-[0.22em] text-[#6e4c12]">
           {eyebrow}
         </p>
 
-        <h2 className="font-serif text-2xl tracking-[-0.035em] text-[#2c2925]">
+         <h2 className="font-serif text-xl break-words tracking-[-0.035em] text-[#2c2925] sm:text-2xl">
           {title}
         </h2>
       </div>
@@ -57,7 +57,7 @@ function SectionHeading({
       {href && (
         <Link
           href={href}
-          className="group flex items-center gap-1.5 text-[11px] font-medium text-[#2c2925]/45 transition-colors hover:text-[#6e4c12]"
+          className="group flex items-center shrink-0 gap-1.5 text-[11px] font-medium text-[#2c2925]/45 transition-colors hover:text-[#6e4c12]"
         >
           Ver todos
           <ArrowRight
@@ -128,6 +128,7 @@ export default function AdminPage() {
     data,
     isLoading,
     isError,
+    refetch,
   } = useQuery<AdminDashboardData>({
     queryKey: ["admin-dashboard"],
     queryFn: getAdminDashboard,
@@ -250,6 +251,36 @@ export default function AdminPage() {
       (1000 * 60 * 60 * 24),
     ),
   );
+
+  if (isError) {
+    return (
+      <AdminShell>
+        <AdminPageHeader
+          eyebrow="Visão geral"
+          title="Olá, Mariana & Henrique."
+          description="Tudo que vocês precisam acompanhar para manter o grande dia organizado."
+        />
+
+        <div className="flex flex-col items-center gap-4 rounded-3xl border border-[#2c2925]/7 bg-white/45 p-10 text-center">
+          <p className="font-serif text-xl text-[#2c2925]">
+            Não foi possível carregar o painel.
+          </p>
+
+          <p className="max-w-sm text-xs text-[#2c2925]/45">
+            Verifique sua conexão e tente novamente.
+          </p>
+
+          <button
+            type="button"
+            onClick={() => refetch()}
+            className="rounded-full bg-[#2c2925] px-5 py-2.5 text-xs font-medium text-white transition-opacity hover:opacity-90"
+          >
+            Tentar novamente
+          </button>
+        </div>
+      </AdminShell>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -466,25 +497,34 @@ export default function AdminPage() {
             href="/admin/photos"
           />
 
-          <div className="grid h-62.5 grid-cols-3 gap-2 overflow-hidden rounded-2xl">
-            {photos.slice(0, 3).map((photo, index) => (
-              <div
-                key={photo.id}
-                className={[
-                  "group relative overflow-hidden bg-[#2c2925]/5",
-                  index === 0 ? "col-span-2" : "",
-                ].join(" ")}
-              >
-                <img
-                  src={photo.url}
-                  alt={photo.name}
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+         {photos.length === 0 ? (
+            <div className="flex aspect-4/3 flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-[#2c2925]/10 text-[#2c2925]/35">
+              <Camera size={28} />
+              <p className="font-lora text-xs">Nenhuma foto enviada ainda</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {photos.slice(0, 3).map((photo, index) => (
+                <div
+                  key={photo.id}
+                  className={[
+                    "group relative overflow-hidden rounded-2xl bg-[#2c2925]/5",
+                    index === 0
+                      ? "col-span-2 aspect-video sm:col-span-1 sm:aspect-4/3"
+                      : "aspect-square sm:aspect-4/3",
+                  ].join(" ")}
+                >
+                  <img
+                    src={photo.url}
+                    alt={photo.name}
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
 
-                <div className="absolute inset-0 bg-linear-to-t from-black/25 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-              </div>
-            ))}
-          </div>
+                  <div className="absolute inset-0 bg-linear-to-t from-black/25 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                </div>
+              ))}
+            </div>
+          )}
 
           <div className="mt-4 flex items-center justify-between">
             <p className="text-[11px] text-[#2c2925]/40">

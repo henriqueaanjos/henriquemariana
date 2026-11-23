@@ -49,8 +49,8 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
-      className={`h-full antialiased snap-mandatory snap-y ${cormorant.variable} ${lora.variable}`}
+      lang="pt-BR"
+      className={`h-full antialiased ${cormorant.variable} ${lora.variable}`}
     >
       <body className={`min-h-full flex flex-col`}>
         <Providers>

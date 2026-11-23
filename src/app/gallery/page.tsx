@@ -27,6 +27,51 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
+function AlbumPhoto({
+  src,
+  album,
+  index,
+  onOpen,
+}: {
+  src: string;
+  album: string;
+  index: number;
+  onOpen: () => void;
+}) {
+  const [status, setStatus] = useState<"loading" | "loaded" | "error">("loading");
+
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      aria-label={`Abrir foto ${index + 1} do álbum ${album}`}
+      className="group relative mb-2 block aspect-4/3 w-full break-inside-avoid overflow-hidden rounded-xl bg-primary-light sm:mb-4 sm:rounded-2xl"
+    >
+      {status === "loading" && (
+        <div className="absolute inset-0 animate-pulse bg-linear-to-br from-primary-light to-primary/30" />
+      )}
+
+      {status === "error" ? (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-primary-dark/40">
+          <ImagesIcon size={28} />
+          <span className="font-lora text-[10px]">Foto indisponível</span>
+        </div>
+      ) : (
+        <img
+          src={src}
+          alt={`${album} - foto ${index + 1}`}
+          loading="lazy"
+          onLoad={() => setStatus("loaded")}
+          onError={() => setStatus("error")}
+          className={`block h-full w-full object-cover transition-all duration-700 group-hover:scale-[1.02] ${
+            status === "loaded" ? "opacity-100" : "opacity-0"
+          }`}
+        />
+      )}
+    </button>
+  );
+}
+
 export default function GalleryPage() {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -68,7 +113,12 @@ export default function GalleryPage() {
     setSelectedPhoto(null);
   }
 
-  const { data: albums = [] } = useQuery({
+   const {
+    data: albums = [],
+    isPending: isLoadingAlbums,
+    isError: isErrorAlbums,
+    refetch: refetchAlbums,
+  } = useQuery({
     queryKey: ["albums"],
     queryFn: getStaticPhotos,
   });
@@ -82,6 +132,18 @@ export default function GalleryPage() {
   });
 
   const galleryPhotos = selectedAlbum.photos ?? [];
+
+  if (isErrorAlbums) {
+    return (
+      <div className="relative flex min-h-svh w-full flex-col items-center justify-center gap-4 bg-background px-4 text-center text-primary-dark/50">
+        <ImagesIcon size={48} />
+        <p className="font-lora text-sm">Não foi possível carregar os álbuns.</p>
+        <Button onClick={() => refetchAlbums()} variant="secondary">
+          Tentar novamente
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <AnimatePresence>
@@ -144,9 +206,17 @@ export default function GalleryPage() {
           </div>
         </header>
 
-
         {/* ÁLBUNS */}
-        {!selectedAlbum.album ? (
+        {isLoadingAlbums ? (
+  <div className="relative z-10 mt-6 grid w-full grid-cols-1 gap-5 sm:mt-8 sm:grid-cols-2 sm:gap-6 lg:mt-8 lg:grid-cols-4">
+    {Array.from({ length: 3 }).map((_, index) => (
+      <div
+        key={index}
+        className="mx-auto aspect-4/3 w-[90%] animate-pulse rounded-2xl bg-primary-light/70"
+      />
+    ))}
+  </div>
+) : !selectedAlbum.album ? (
           <div className="relative z-10 mt-6 grid w-full grid-cols-1 items-start gap-5 sm:mt-8 sm:grid-cols-2 sm:gap-6 lg:mt-8 lg:grid-cols-4">
             {/* ENVIOS */}
             <button
@@ -190,21 +260,14 @@ export default function GalleryPage() {
           <>
             {/* FOTOS DO ÁLBUM */}
             <div className="relative z-10 mt-6 columns-2 gap-2 sm:mt-7 sm:columns-2 sm:gap-3 lg:columns-3 xl:columns-4">
-              {galleryPhotos.map((photo, index) => (
-                <button
-                  type="button"
+               {galleryPhotos.map((photo, index) => (
+                <AlbumPhoto
                   key={`${photo}-${index}`}
-                  onClick={() => handleOpenPhoto(index)}
-                  aria-label={`Abrir foto ${index + 1} do álbum ${selectedAlbum.album}`}
-                  className="group mb-2 block w-full break-inside-avoid overflow-hidden rounded-xl sm:mb-4 sm:rounded-2xl"
-                >
-                  <img
-                    src={photo}
-                    alt={`${selectedAlbum.album} - foto ${index + 1}`}
-                    loading="lazy"
-                    className="block h-auto w-full transition-transform duration-700 group-hover:scale-[1.02]"
-                  />
-                </button>
+                  src={photo}
+                  album={selectedAlbum.album}
+                  index={index}
+                  onOpen={() => handleOpenPhoto(index)}
+                />
               ))}
             </div>
           </>

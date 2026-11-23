@@ -66,10 +66,7 @@ export function LiquidGlassWrapper({ children, className, isGlassEffect = true }
                 </filter>
             </svg> */}
             <div
-                className={`w-full h-full absolute z-0 inset-0 ${isGlassEffect && "backdrop-blur-xs"}  transition-all duration-500 overflow-hidden isolate `}
-                style={{
-                    filter: isGlassEffect ? "url(#glass-distortion)" : "none",
-                }}></div>
+                className={`w-full h-full absolute z-0 inset-0 ${isGlassEffect && "backdrop-blur-xs"}  transition-all duration-500 overflow-hidden isolate `}></div>
             <div className={`w-full h-full z-1 absolute inset-0 ${isGlassEffect ? "bg-black/10" : "bg-black/0"}`}></div>
             <div className={`w-full h-full absolute inset-0 z-2 overflow-hidden ${roundedClass ?? "rounded-4xl"} 
             ${isGlassEffect ? "shadow-[inset_1px_1px_1px_0_rgba(125,125,125,0.2),inset_-1px_-1px_1px_1px_rgba(125,125,125,0.2)]" : ""} 
